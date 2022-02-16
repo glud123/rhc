@@ -1,0 +1,12 @@
+{
+  "name": "rhc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "site": "npm run --prefix site",
+    "components": "npm run --prefix components"
+  },
+  "author": "",
+  "license": "MIT"
+}

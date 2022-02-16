@@ -1,0 +1,9 @@
+node_modules
+.DS_Store
+dist
+dist-ssr
+*.local
+.history
+*/dist
+*/.parcel-cache
+*/node_modules
