@@ -3,7 +3,7 @@ import { BrowserRouter as Router } from "react-router-dom";
 import Routes, { routes } from "./routes";
 import PageLayout from "@/components/PageLayout";
 
-const _BASENAME = process.env.NODE_ENV === "development" ? "" : "/rhc";
+const _BASENAME = process.env.NODE_ENV === "development" ? "/rhc" : "";
 
 const App = () => {
   return (
