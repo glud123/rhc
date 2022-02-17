@@ -1,0 +1,28 @@
+{
+  "name": "form",
+  "version": "1.0.0",
+  "description": "",
+  "source": "index.tsx",
+  "main": "dist/main.js",
+  "module": "dist/module.js",
+  "types": "dist/types.d.ts",
+  "scripts": {
+    "build": "npm install; parcel build"
+  },
+  "alias": {
+    "@/*": "./src/$1"
+  },
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "^17.0.2"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.39",
+    "parcel": "^2.3.1",
+    "typescript": "^4.5.5"
+  },
+  "dependencies": {
+    "react": "^17.0.2"
+  }
+}

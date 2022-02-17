@@ -1,0 +1,19 @@
+.form-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.form-item .label {
+  height: 30px;
+  min-width: 80px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.form-item .require::after {
+  padding-top: 4px;
+  content: "*";
+  color: #ff4d4f;
+}

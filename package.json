@@ -6,6 +6,10 @@
     "site": "npm run --prefix site",
     "components": "npm run --prefix components"
   },
-  "author": "glud123",
+  "author": "glud0309@gmail.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/glud123/rhc"
+  },
   "license": "MIT"
 }

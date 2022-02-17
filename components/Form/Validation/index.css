@@ -1,0 +1,20 @@
+.verification_container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.verification_container .verification_error {
+  position: absolute;
+  bottom: -16px;
+  left: 0;
+  height: 16px;
+  font-size: 12px;
+  color: #ff4d4f;
+  z-index: 1;
+}
+
+.verification_container .verification_content_error > div {
+  border: 1px solid #ff4d4f;
+  border-radius: 4px;
+}
