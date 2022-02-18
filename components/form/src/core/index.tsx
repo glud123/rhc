@@ -19,7 +19,7 @@ export interface CorePropsInterface {
   itemLayout?: React.ReactNode;
 }
 
-const Form: FC<CorePropsInterface> = (props) => {
+const FormCore: FC<CorePropsInterface> = (props) => {
   const {
     form,
     isEdit = true,
@@ -92,4 +92,4 @@ const Form: FC<CorePropsInterface> = (props) => {
   );
 };
 
-export default Form;
+export default FormCore;

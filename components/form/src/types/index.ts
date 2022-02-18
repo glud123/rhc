@@ -46,6 +46,10 @@ export interface SubscribeInterface {
   (options?: SubscribeOptionsType): void;
 }
 
+export interface useFormContextInterface {
+  (): [FormStateType, (state: FormStateType) => void];
+}
+
 export interface UseFormInterface {
   (name: string): FormType;
 }
@@ -63,9 +67,10 @@ export interface ValidateInterface {
   (paths?: NamesPath): Promise<any>;
 }
 
-export interface CreateInterface {
-  (): { useForm: UseFormInterface; useFormContext: useFormContextInterface };
-}
+export type CreateType = {
+  useForm: UseFormInterface;
+  useFormContext: useFormContextInterface;
+};
 
 export interface GetNameInterface {
   (pathOffset?: number, type?: "string" | "array"): string | NamePath;
@@ -123,8 +128,4 @@ type FormReducerActionType = {
 
 export interface FormReducerInterface {
   (state: FormContextType, action: FormReducerActionType): FormContextType;
-}
-
-export interface useFormContextInterface {
-  (): [FormStateType, (state: FormStateType) => void];
 }

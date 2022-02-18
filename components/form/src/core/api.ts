@@ -12,16 +12,16 @@ import {
   ResetInterface,
   SubscribeInterface,
   ValidateInterface,
-  CreateInterface,
+  CreateType,
   SubscribeValidateInterface,
   GetNameInterface,
   ConvertNameInterface,
   NamePath,
   useFormContextInterface,
   FormStateType,
-} from "./types";
+} from "../types";
 
-const create: CreateInterface = () => {
+const create: () => CreateType = () => {
   let initialContext: ContextType = {};
 
   const { state, listeners, listeners4Validate, destroy } = useFormStore();
