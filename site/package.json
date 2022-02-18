@@ -8,7 +8,8 @@
     "build": "rm -rf dist; npm install; npx parcel build --public-url /rhc"
   },
   "alias": {
-    "@/*": "./src/$1"
+    "@/*": "./src/$1",
+    "@rhc/*": "../components/$1"
   },
   "author": "",
   "license": "MIT",
