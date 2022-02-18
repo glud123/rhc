@@ -4,8 +4,8 @@
   "description": "",
   "source": "/src/index.html",
   "scripts": {
-    "start": "npm install; parcel",
-    "build": "rm -rf dist; npm install; parcel build --public-url /rhc"
+    "start": "npm install; npx parcel",
+    "build": "rm -rf dist; npm install; npx parcel build --public-url /rhc"
   },
   "alias": {
     "@/*": "./src/$1"

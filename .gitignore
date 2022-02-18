@@ -4,6 +4,5 @@ dist
 dist-ssr
 *.local
 .history
-*/dist
-*/.parcel-cache
-*/node_modules
+dist
+.parcel-cache

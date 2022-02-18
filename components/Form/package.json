@@ -7,7 +7,8 @@
   "module": "dist/module.js",
   "types": "dist/types.d.ts",
   "scripts": {
-    "build": "npm install; parcel build"
+    "start": "npm install",
+    "build": "rm -rf dist; npm install; npx parcel build"
   },
   "alias": {
     "@/*": "./src/$1"
@@ -18,6 +19,7 @@
     "react": "^17.0.2"
   },
   "devDependencies": {
+    "@parcel/transformer-typescript-types": "^2.3.1",
     "@types/react": "^17.0.39",
     "parcel": "^2.3.1",
     "typescript": "^4.5.5"
