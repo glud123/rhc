@@ -3,12 +3,12 @@
   "version": "0.0.1",
   "description": "React Hook Component",
   "scripts": {
-    "site": "npm run --prefix site",
-    "site-start": "npm run site start",
-    "site-build": "npm run site build",
+    "site-start": "npm run c-build; npm run site start",
+    "site-build": "npm run c-build; npm run site build",
     "c-build": "./batch_execution_scipt ./components build",
     "c-start": "./batch_execution_scipt ./components start",
-    "all-start": "./batch_execution_scipt . start"
+    "all-start": "./batch_execution_scipt . start",
+    "site": "npm run --prefix site"
   },
   "author": "glud0309@gmail.com",
   "repository": {
