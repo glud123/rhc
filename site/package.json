@@ -4,7 +4,8 @@
   "description": "",
   "source": "src/index.html",
   "scripts": {
-    "start": "npm install; npx parcel",
+    "install-packages": "npm install",
+    "start": "npx parcel",
     "build": "rm -rf dist; npm install; npx parcel build --public-url /rhc"
   },
   "alias": {
@@ -24,7 +25,6 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-jss": "^10.9.0",
-    "react-router-dom": "^6.2.1",
-    "demo": "^1.0.0"
+    "react-router-dom": "^6.2.1"
   }
 }

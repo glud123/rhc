@@ -37,7 +37,7 @@ jobs:
       # Runs a single command using the runners shell
       - name: Install Dependencies And Build
         run: |
-          npm run site build
+          npm run build
 
       # Runs a set of commands using the runners shell
       - name: Deploy
