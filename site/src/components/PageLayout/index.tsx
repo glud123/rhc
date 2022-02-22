@@ -97,7 +97,7 @@ const useStyles = createUseStyles({
     top: "0",
     left: "0",
     height: "60px",
-    backgroundColor: "#21325E",
+    backgroundColor: "#1a1d3a",
     width: "100%",
   },
   headerContent: {
