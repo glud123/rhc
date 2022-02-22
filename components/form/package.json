@@ -10,13 +10,17 @@
     "dist"
   ],
   "scripts": {
-    "link-react": "npm link ../../site/node_modules/react",
-    "build": "rm -rf dist; npm install; npx parcel build"
+    "link-react": "npm link ../../site/node_modules/react; npm link ../../site/node_modules/@types/react",
+    "build": "rm -rf dist; npm install; npx parcel build",
+    "watch": "npx parcel watch src/index.tsx"
   },
   "author": "glud123",
   "license": "MIT",
   "target": {
     "isLibrary": true
+  },
+  "alias": {
+    "@parcel/transformer-react-refresh-wrap": "./node_modules/@parcel/transformer-react-refresh-wrap"
   },
   "peerDependencies": {
     "react": "^17.0.2"

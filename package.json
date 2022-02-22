@@ -10,7 +10,8 @@
     "site-build": "npm run site build",
     "c-build": "./batch_execution_scipt ./components build",
     "c-start": "./batch_execution_scipt ./components start",
-    "site": "npm run --prefix site"
+    "site": "npm run --prefix site",
+    "components": "npm run --prefix components/*"
   },
   "author": "glud0309@gmail.com",
   "repository": {
