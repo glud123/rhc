@@ -3,6 +3,7 @@ import { createUseStyles } from "react-jss";
 import { Link } from "react-router-dom";
 import Menu from "@/components/Menu";
 import GitHub from "jsx:@/assets/images/github.svg";
+import Logo from "jsx:@/assets/images/logo.svg";
 
 interface PageLayoutProps {
   options: any[];
@@ -17,6 +18,9 @@ const PageLayout: FC<PageLayoutProps> = (props) => {
       <div className={styles.header}>
         <div className={styles.headerContent}>
           <Link className={styles.home} to="/">
+            <span className={styles.logo}>
+              <Logo />
+            </span>
             <span className={styles.title}>RHC</span>
             <span className={styles.sub}>React Hook Component</span>
           </Link>
@@ -56,24 +60,37 @@ const useStyles = createUseStyles({
     gap: 8,
   },
   github: {
-    width: "44px",
-    height: "44px",
+    width: "40px",
+    height: "40px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: "50%",
+    fontSize: "24px",
     "&:hover": {
       backgroundColor: "#3E497A",
     },
+  },
+  logo: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "24px",
   },
   title: {
     fontSize: "18px",
     fontWeight: "700",
     color: "#F1D00A",
+    "&:hover": {
+      color: "#fbe55f",
+    },
   },
   sub: {
     fontSize: "16px",
     color: "#ccc",
+    "&:hover": {
+      color: "#fff",
+    },
   },
   header: {
     position: "fixed",
