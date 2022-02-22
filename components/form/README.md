@@ -6,9 +6,7 @@
 
 ### 简介
 
-基于 React Hooks 的表单组件。
-
-[了解更多](https://glud123.github.io/rhc/)
+基于 React Hooks 的表单组件。 [了解更多](https://glud123.github.io/rhc/)
 
 [Github](https://github.com/glud123/rhc/tree/main/components/form)
 
