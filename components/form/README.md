@@ -10,7 +10,7 @@
 
 [了解更多](https://glud123.github.io/rhc/)
 
-[Github](https://github.com/glud123/rhc)
+[Github](https://github.com/glud123/rhc/tree/main/components/form)
 
 ### 能力
 
