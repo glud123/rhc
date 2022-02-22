@@ -1,16 +1,19 @@
 {
   "name": "@rhc/form",
   "version": "0.0.1",
-  "description": "",
+  "description": "react hook component for form",
   "source": "src/index.tsx",
   "main": "dist/main.js",
   "module": "dist/module.js",
   "types": "dist/types.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "link-react": "npm link ../../site/node_modules/react",
     "build": "rm -rf dist; npm install; npx parcel build"
   },
-  "author": "",
+  "author": "glud123",
   "license": "MIT",
   "target": {
     "isLibrary": true
