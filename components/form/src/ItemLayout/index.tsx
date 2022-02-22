@@ -5,15 +5,15 @@ import "./index.css";
 interface ItemPropsInterface {
   name: NamePathType;
   label?: string | React.ReactNode;
-  require?: boolean;
+  required?: boolean;
 }
 
 const ItemLayout: FC<ItemPropsInterface> = (props) => {
-  const { label, require = false, children } = props;
+  const { label, required = false, children } = props;
 
   let nextLabel = label ? (
     typeof label === "string" ? (
-      <label className={require ? "label require" : "label"}>{label}</label>
+      <label className={required ? "label required" : "label"}>{label}</label>
     ) : (
       label
     )
