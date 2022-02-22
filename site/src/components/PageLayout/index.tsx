@@ -2,6 +2,7 @@ import React, { FC } from "react";
 import { createUseStyles } from "react-jss";
 import { Link } from "react-router-dom";
 import Menu from "@/components/Menu";
+import GitHub from "jsx:@/assets/images/github.svg";
 
 interface PageLayoutProps {
   options: any[];
@@ -19,7 +20,16 @@ const PageLayout: FC<PageLayoutProps> = (props) => {
             <span className={styles.title}>RHC</span>
             <span className={styles.sub}>React Hook Component</span>
           </Link>
-          <Menu options={options} />
+          <div className={styles.rigth}>
+            <Menu options={options} />
+            <a
+              className={styles.github}
+              href="https://github.com/glud123/rhc"
+              target="_blank"
+            >
+              <GitHub />
+            </a>
+          </div>
         </div>
       </div>
       <div className={styles.content}>{children}</div>
@@ -39,6 +49,22 @@ const useStyles = createUseStyles({
     alignItems: "center",
     gap: 8,
     textDecoration: "none",
+  },
+  rigth: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+  },
+  github: {
+    width: "44px",
+    height: "44px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: "50%",
+    "&:hover": {
+      backgroundColor: "#3E497A",
+    },
   },
   title: {
     fontSize: "18px",
