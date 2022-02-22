@@ -21,6 +21,5 @@
       "@rhc/*": ["components/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "**/*.d.ts"]
+  "include": ["src/**/*", "./index.d.ts", "node_modules/@types/**/*.d.ts"]
 }
