@@ -19,7 +19,12 @@ const Select: FC<SelectProps> = (props) => {
     onChange && onChange(e.target.value);
   };
   return (
-    <select value={value} onChange={handleChange} placeholder={placeholder}>
+    <select
+      value={value}
+      onChange={handleChange}
+      placeholder={placeholder}
+      style={{ width: "147px" }}
+    >
       {(options || []).map((item) => {
         return (
           <option key={item.value} value={item.value}>
