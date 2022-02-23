@@ -5,7 +5,7 @@
   "source": "src/index.html",
   "scripts": {
     "install-packages": "npm install",
-    "start": "npx parcel",
+    "start": "npx parcel --no-cache",
     "build": "rm -rf dist; npm install; npx parcel build --public-url /rhc",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint": "prettier --check \"src/**/*.{js,jsx,ts,tsx}\""
