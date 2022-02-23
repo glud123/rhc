@@ -1,7 +1,7 @@
 import React, { FC, useState } from "react";
 import Form, { useForm } from "@rhc/form";
 import Input from "@/components/Input";
-import Select from "@/components/Slecect";
+import Select from "@/components/Select";
 
 const Page = () => {
   const form = useForm("demo");
