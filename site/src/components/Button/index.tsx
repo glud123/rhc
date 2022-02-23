@@ -3,12 +3,12 @@ import { createUseStyles } from "react-jss";
 
 interface ButtonProps {
   type?: "primary" | "secondary" | "default";
-  size?: "small" | "medium" | "large";
   style?: React.CSSProperties;
+  onClick?: () => void;
 }
 
 const Button: FC<ButtonProps> = (props) => {
-  const { style, children, type = "default" } = props;
+  const { style, children, onClick, type = "default" } = props;
   const styles = useStyles();
 
   return (
@@ -16,6 +16,7 @@ const Button: FC<ButtonProps> = (props) => {
       className={`${styles.button} ${styles[type]}`}
       style={style}
       type="button"
+      onClick={onClick}
     >
       {children}
     </button>
@@ -31,8 +32,11 @@ const useStyles = createUseStyles({
     borderStyle: "solid",
     borderRadius: "4px",
     color: "#fff",
-    padding: "16px 10px",
+    padding: "10px 16px",
     width: "100%",
+    cursor: "pointer",
+    transition: "all 0.3s ease-in-out",
+    textTransform: "uppercase",
   },
   default: {
     borderColor: "#2f3856",
@@ -54,6 +58,7 @@ const useStyles = createUseStyles({
     borderColor: "#ec5990",
     backgroundColor: "#000000",
     "&:hover": {
+      borderColor: "#bf1650",
       backgroundColor: "#0e101c",
     },
   },
