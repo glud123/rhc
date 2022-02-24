@@ -3,26 +3,22 @@ import { createUseStyles } from "react-jss";
 import Form, { useForm } from "@rhc/form";
 import Info from "@/components/Info";
 
-const Watch = () => {
+const Submit = () => {
   const styles = useStyles();
   const form = useForm("live-demo");
 
-  form.subscribe();
-
-  let formValue = form.get();
-
   return (
-    <div className={styles.watch}>
-      <Info>监听表单值的变化</Info>
-      <pre className={styles.pre}>{JSON.stringify(formValue, null, 2)}</pre>
+    <div className={styles.submit}>
+      <Info>点击【提交】按钮后的数据将在这里显示</Info>
+      <pre className={styles.pre}>{JSON.stringify({}, null, 2)}</pre>
     </div>
   );
 };
 
-export default Watch;
+export default Submit;
 
 const useStyles = createUseStyles({
-  watch: {
+  submit: {
     display: "flex",
     flexDirection: "column",
     gap: "8px",
