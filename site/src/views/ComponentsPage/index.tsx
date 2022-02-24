@@ -2,6 +2,7 @@ import React, { FC, useState } from "react";
 import Form, { useForm } from "@rhc/form";
 import Input from "@/components/Input";
 import Select from "@/components/Select";
+import Button from "@/components/Button";
 
 const Page = () => {
   const form = useForm("demo");
@@ -83,9 +84,9 @@ const Page = () => {
           />
         </Form.Item>
       </Form>
-      <button type="button" onClick={handleClick}>
+      <Button type="secondary" onClick={handleClick}>
         取值
-      </button>
+      </Button>
       <div>{JSON.stringify(formData)}</div>
     </div>
   );

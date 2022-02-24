@@ -48,6 +48,7 @@ const useStyles = createUseStyles({
     },
     "& span": {
       color: "#fff",
+      fontSize: "24px",
     },
   },
   bottom: {},
