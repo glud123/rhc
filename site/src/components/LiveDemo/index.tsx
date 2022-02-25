@@ -40,7 +40,9 @@ const useStyles = createUseStyles({
   live_demo: {
     display: "flex",
     gap: "32px",
+    padding: "0px",
     "& li": {
+      flex: 1,
       listStyle: "none",
     },
   },
