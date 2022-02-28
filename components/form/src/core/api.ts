@@ -142,7 +142,7 @@ const create: () => CreateType = () => {
             ) {
               currentListeners[name][KEY].forEach(
                 (listener: (values: any, state?: "update") => void) =>
-                  listener(currentListeners[name], "update")
+                  listener(currentState[name], "update")
               );
             }
           }
