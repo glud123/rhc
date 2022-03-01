@@ -4,7 +4,7 @@ import { FormContext, ItemContext, useFormStore } from "./context";
 import {
   FormActionEnum,
   UseFormInterface,
-  ContextType,
+  ValueType,
   NamePathType,
   GetInterface,
   SetInterface,
@@ -12,17 +12,17 @@ import {
   ResetInterface,
   SubscribeInterface,
   ValidateInterface,
-  CreateType,
+  FormAPIType,
   SubscribeValidateInterface,
   GetNameInterface,
   ConvertNameInterface,
   NamePath,
   useFormContextInterface,
-  FormStateType,
+  StoreType,
 } from "../types";
 
-const create: () => CreateType = () => {
-  let initialContext: ContextType = {};
+const createFormAPI: () => FormAPIType = () => {
+  let formInitialValue: ValueType = {};
 
   const { state, listeners, listeners4Validate, destroy } = useFormStore();
 
@@ -163,13 +163,13 @@ const create: () => CreateType = () => {
     };
     // 设置初始值
     const setInitialValue: SetInterface = (initialValue) => {
-      initialContext[name] = JSON.stringify(initialValue);
+      formInitialValue[name] = JSON.stringify(initialValue);
     };
     // 重置
     const reset: ResetInterface = () => {
-      if (initialContext[name]) {
+      if (formInitialValue[name]) {
         try {
-          set(JSON.parse(initialContext[name]));
+          set(JSON.parse(formInitialValue[name]));
         } catch (error) {
           throw new Error(error as string);
         }
@@ -309,25 +309,28 @@ const create: () => CreateType = () => {
         getName,
         convertName,
       },
+      _private: {
+        context: FormContext,
+      },
     };
   };
 
   // 表单上下文hooks
   const useFormContext: useFormContextInterface = () => {
-    const { store, dispatch } = useContext(FormContext);
-    const dispatchState = (state: FormStateType) => {
+    const { formStore, dispatch } = useContext(FormContext);
+    const dispatchStore = (state: StoreType) => {
       dispatch({
-        type: FormActionEnum.State,
+        type: FormActionEnum.Store,
         data: state,
       });
     };
-    return [store.state, dispatchState];
+    return [formStore.store, dispatchStore];
   };
 
   return { useForm, useFormContext };
 };
 
-export default create;
+export default createFormAPI;
 
 // 表单项工具方法
 /**

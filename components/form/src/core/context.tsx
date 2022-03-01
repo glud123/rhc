@@ -1,7 +1,16 @@
 import React from "react";
-import type { FormContextStoreType, FormReducerInterface } from "../types";
+import { FormActionEnum } from "../types";
+import type {
+  FormContextType,
+  FormInstanceType,
+  FormReducerInterface,
+  WrapperType,
+} from "../types";
 
-export const FormContext = React.createContext<FormContextStoreType>({
+/**
+ * 表单上下文
+ */
+export const FormContext = React.createContext<FormContextType>({
   store: {},
   dispatch: () => {},
 } as any);
@@ -11,13 +20,18 @@ export const FormContext = React.createContext<FormContextStoreType>({
  */
 export const formReducer: FormReducerInterface = (state, action) => {
   const { type, data } = action;
-  if (type === "update") {
-    return { ...state };
+  switch (type) {
+    case FormActionEnum.Form:
+      return { ...state, form: data as FormInstanceType };
+    case FormActionEnum.State:
+      return { ...state, state: { ...state["state"], ...data } };
+    case FormActionEnum.Update:
+      return { ...state };
+    case FormActionEnum.Wrapper:
+      return { ...state, wrapper: data as WrapperType };
+    default:
+      return { ...state, store: { ...state["store"], ...data } };
   }
-  if (type === "form") {
-    return { ...state, form: data as any };
-  }
-  return { ...state, [type]: { ...state[type], ...data } };
 };
 
 export const ItemContext = React.createContext({} as any);

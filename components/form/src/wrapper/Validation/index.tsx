@@ -1,16 +1,16 @@
 import React, { FC, useCallback, useState } from "react";
-import type { FormType, NamePath, NamePathType } from "../types";
+import type { FormInstanceType, NamePath, NamePathType } from "../../types";
 import "./index.css";
 
-interface ValidationProps {
-  form: FormType;
+interface WrapperValidationProps {
+  form: FormInstanceType;
   name: NamePathType;
   rules: (value: any, allValues: any) => Promise<any>;
   onChange?: any;
   [k: string]: any;
 }
 
-const Validation: FC<ValidationProps> = (props) => {
+const WrapperValidation: FC<WrapperValidationProps> = (props) => {
   const { children, form, name, onChange, rules, ...rest } = props;
 
   let namePath = form.item.getName() as NamePath;
@@ -70,5 +70,6 @@ const Validation: FC<ValidationProps> = (props) => {
   );
 };
 
-export default Validation;
-export type ValidationType = typeof Validation;
+export default WrapperValidation;
+
+export type WrapperValidationType = typeof WrapperValidation;

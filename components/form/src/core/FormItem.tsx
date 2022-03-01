@@ -1,26 +1,41 @@
 import React, { FC, useContext } from "react";
 import { FormContext, ItemContext } from "./context";
-import type { NamePath, NamePathType, Validation } from "../types";
+import type {
+  NamePath,
+  NamePathType,
+  WrapperItemType,
+  WrapperValidationType,
+} from "../types";
 
-export interface ItemPropsInterface {
+export interface FormItemPropsInterface {
   name: NamePathType;
   label?: string | React.ReactNode;
   required?: boolean;
-  verifier?: React.ReactNode;
+  wrapperItem?: WrapperItemType;
+  wrapperValidation?: WrapperValidationType;
   rules?: (value: any, allValues: any) => Promise<any>;
   [k: string]: any;
 }
 
-const Item: FC<ItemPropsInterface> = (props) => {
-  const { name, label, required, children, verifier, rules, ...rest } = props;
+const FormItem: FC<FormItemPropsInterface> = (props) => {
+  const {
+    name,
+    label,
+    required,
+    children,
+    wrapperItem,
+    wrapperValidation,
+    rules,
+    ...rest
+  } = props;
 
-  const { store } = useContext(FormContext);
+  const { formStore } = useContext(FormContext);
 
-  if (!store.form) {
+  if (!formStore.form) {
     return null;
   }
 
-  const { form, options, state } = store;
+  const { form, wrapper, state } = formStore;
 
   let currentName = [...(form.item.getName() as NamePath), name] as NamePath;
 
@@ -36,7 +51,9 @@ const Item: FC<ItemPropsInterface> = (props) => {
   if (!(children && typeof (children as any).type === "string")) {
     if (rules && rules.length > 0) {
       nextChildren = React.createElement(
-        (verifier ? (verifier as Validation) : options.verifier) as any,
+        (wrapperValidation
+          ? wrapperValidation
+          : wrapper.wrapperValidation) as any,
         {
           form: form,
           name: name,
@@ -59,7 +76,7 @@ const Item: FC<ItemPropsInterface> = (props) => {
   return (
     <ItemContext.Provider value={{ __parent: currentName }}>
       {React.createElement(
-        options.itemLayout as any,
+        (wrapperItem ? wrapperItem : wrapper.wrapperItem) as any,
         {
           form: form,
           name,
@@ -73,4 +90,6 @@ const Item: FC<ItemPropsInterface> = (props) => {
   );
 };
 
-export default Item;
+export default FormItem;
+
+export type FormItemType = typeof FormItem;

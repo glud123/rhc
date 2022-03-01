@@ -1,34 +1,31 @@
-import FormCore from "./core";
-import Item from "./core/item";
-import List from "./core/list";
-import create from "./core/api";
-import type { CreateType } from "./types";
+import { FormCore, FormList, FormItem, createFormAPI } from "./core";
+import type {
+  FormAPIType,
+  FormCoreType,
+  FormListType,
+  FormItemType,
+} from "./types";
 
-const createCenerator: CreateType = create();
+const formAPI: FormAPIType = createFormAPI();
 
-type FormType = typeof FormCore;
-
-interface FormInterface extends FormType {
-  Item: typeof Item;
-  List: typeof List;
-  useForm: typeof createCenerator.useForm;
-  useFormContext: typeof createCenerator.useFormContext;
+interface FormInterface extends FormCoreType {
+  Item: FormItemType;
+  List: FormListType;
+  useForm: FormAPIType["useForm"];
+  useFormContext: FormAPIType["useFormContext"];
 }
 
 const Form = FormCore as FormInterface;
 
-Form.List = List;
-Form.Item = Item;
-Form.useForm = createCenerator.useForm;
-Form.useFormContext = createCenerator.useFormContext;
+Form.List = FormList;
+Form.Item = FormItem;
+Form.useForm = formAPI.useForm;
+Form.useFormContext = formAPI.useFormContext;
 
-const FormItem: typeof Item = Item;
+const useForm: FormAPIType["useForm"] = formAPI.useForm;
 
-const useForm: typeof createCenerator.useForm = createCenerator.useForm;
+const useFormContext: FormAPIType["useFormContext"] = formAPI.useFormContext;
 
-const useFormContext: typeof createCenerator.useFormContext =
-  createCenerator.useFormContext;
-
-export { FormItem, useForm, useFormContext };
+export { useForm, useFormContext };
 
 export default Form;

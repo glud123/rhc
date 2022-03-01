@@ -1,51 +1,56 @@
-import React, { FC, useCallback, useEffect, useState, useReducer } from "react";
+import React, { FC, useCallback, useEffect, useReducer } from "react";
 import { FormContext, formReducer } from "./context";
-import Validation from "../Validation";
-import ItemLayout from "../ItemLayout";
-import { FormType, FormActionEnum } from "../types";
+import WrapperValidation from "../wrapper/Validation";
+import WrapperItem from "../wrapper/Item";
+import {
+  FormInstanceType,
+  FormActionEnum,
+  WrapperItemType,
+  WrapperValidationType,
+} from "../types";
 
-export interface CorePropsInterface {
+export interface FormCorePropsInterface {
   // 表单数据操作方法集合
-  form: FormType;
+  form: FormInstanceType;
   // 表单是否是编辑态
   isEdit?: boolean;
   // 表单项校验组件
-  verifier?: React.ReactNode;
+  wrapperValidation?: WrapperValidationType;
   // 表单初始值
   initialValues?: any;
   // 表单值
   value?: any;
   // 表单项容器组件
-  itemLayout?: React.ReactNode;
+  wrapperItem?: WrapperItemType;
 }
 
-const FormCore: FC<CorePropsInterface> = (props) => {
+const FormCore: FC<FormCorePropsInterface> = (props) => {
   const {
     form,
     isEdit = true,
-    verifier = Validation,
-    itemLayout = ItemLayout,
+    wrapperItem = WrapperItem,
+    wrapperValidation = WrapperValidation,
     initialValues = {},
     value,
     children,
   } = props;
 
-  const [store, dispatch] = useReducer(formReducer, {
+  const [formStore, dispatch] = useReducer(formReducer, {
     form,
-    options: {
-      verifier,
-      itemLayout,
+    wrapper: {
+      wrapperItem,
+      wrapperValidation,
     },
     state: {
       isEdit,
     },
+    store: {},
   });
 
   const listener = useCallback((_, state) => {
     if (state === "update") {
       dispatch({
         type: FormActionEnum.Update,
-        data: null,
       });
     }
   }, []);
@@ -66,13 +71,13 @@ const FormCore: FC<CorePropsInterface> = (props) => {
       data: { isEdit },
     });
     dispatch({
-      type: FormActionEnum.Options,
+      type: FormActionEnum.Wrapper,
       data: {
-        verifier,
-        itemLayout,
+        wrapperItem,
+        wrapperValidation,
       },
     });
-  }, [isEdit, verifier, itemLayout]);
+  }, [isEdit, wrapperItem, wrapperValidation]);
 
   useEffect(() => {
     const formValue = form.get();
@@ -86,10 +91,12 @@ const FormCore: FC<CorePropsInterface> = (props) => {
   }, []);
 
   return (
-    <FormContext.Provider value={{ store, dispatch }}>
+    <FormContext.Provider value={{ formStore, dispatch }}>
       {children}
     </FormContext.Provider>
   );
 };
 
 export default FormCore;
+
+export type FormCoreType = typeof FormCore;

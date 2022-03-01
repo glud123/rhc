@@ -1,14 +1,14 @@
 import React, { FC } from "react";
-import type { NamePathType } from "../types";
+import type { NamePathType } from "../../types";
 import "./index.css";
 
-interface ItemPropsInterface {
+interface WrapperItemInterface {
   name: NamePathType;
   label?: string | React.ReactNode;
   required?: boolean;
 }
 
-const ItemLayout: FC<ItemPropsInterface> = (props) => {
+const WrapperItem: FC<WrapperItemInterface> = (props) => {
   const { label, required = false, children } = props;
 
   let nextLabel = label ? (
@@ -27,4 +27,6 @@ const ItemLayout: FC<ItemPropsInterface> = (props) => {
   );
 };
 
-export default ItemLayout;
+export default WrapperItem;
+
+export type WrapperItemType = typeof WrapperItem;
