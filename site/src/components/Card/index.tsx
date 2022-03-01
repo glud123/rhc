@@ -51,5 +51,7 @@ const useStyles = createUseStyles({
       fontSize: "24px",
     },
   },
-  bottom: {},
+  bottom: {
+    width: "100%",
+  },
 });
