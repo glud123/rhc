@@ -9,29 +9,20 @@ import {
   WrapperValidationType,
 } from "../types";
 
-export interface FormCorePropsInterface {
+interface FormCorePropsInterface {
   // 表单数据操作方法集合
   form: FormInstanceType;
-  // 表单是否是编辑态
-  isEdit?: boolean;
-  // 表单项校验组件
-  wrapperValidation?: WrapperValidationType;
-  // 表单初始值
-  initialValues?: any;
-  // 表单值
-  value?: any;
   // 表单项容器组件
   wrapperItem?: WrapperItemType;
+  // 表单项校验组件
+  wrapperValidation?: WrapperValidationType;
 }
 
 const FormCore: FC<FormCorePropsInterface> = (props) => {
   const {
     form,
-    isEdit = true,
     wrapperItem = WrapperItem,
     wrapperValidation = WrapperValidation,
-    initialValues = {},
-    value,
     children,
   } = props;
 
@@ -41,9 +32,7 @@ const FormCore: FC<FormCorePropsInterface> = (props) => {
       wrapperItem,
       wrapperValidation,
     },
-    state: {
-      isEdit,
-    },
+    state: { isEdit: true },
     store: {},
   });
 
@@ -60,16 +49,6 @@ const FormCore: FC<FormCorePropsInterface> = (props) => {
   });
 
   useEffect(() => {
-    if (value) {
-      form.set(value);
-    }
-  }, [value]);
-
-  useEffect(() => {
-    dispatch({
-      type: FormActionEnum.State,
-      data: { isEdit },
-    });
     dispatch({
       type: FormActionEnum.Wrapper,
       data: {
@@ -77,18 +56,7 @@ const FormCore: FC<FormCorePropsInterface> = (props) => {
         wrapperValidation,
       },
     });
-  }, [isEdit, wrapperItem, wrapperValidation]);
-
-  useEffect(() => {
-    const formValue = form.get();
-    if (
-      Object.keys(formValue).length === 0 &&
-      Object.keys(initialValues).length > 0
-    ) {
-      form.setInitialValue(initialValues);
-      form.reset();
-    }
-  }, []);
+  }, [wrapperItem, wrapperValidation]);
 
   return (
     <FormContext.Provider value={{ formStore, dispatch }}>

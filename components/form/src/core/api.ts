@@ -1,6 +1,6 @@
 import { useEffect, useReducer, useContext } from "react";
-import { FormContext, ItemContext, useFormStore } from "./context";
-
+import { FormContext, ItemContext, createFormStore } from "./context";
+import * as utils from "../utils";
 import {
   FormActionEnum,
   UseFormInterface,
@@ -19,162 +19,131 @@ import {
   NamePath,
   useFormContextInterface,
   StoreType,
+  FieldValueType,
+  SubscribeOptionsType,
 } from "../types";
 
 const createFormAPI: () => FormAPIType = () => {
   let formInitialValue: ValueType = {};
 
-  const { state, listeners, listeners4Validate, destroy } = useFormStore();
+  const { formsState, formsListeners, formsListeners4Validate, formsDestroy } =
+    createFormStore();
 
-  const KEY = Symbol("form");
+  const KEY = Symbol("form") as any;
 
-  const useForm: UseFormInterface = (name) => {
-    let currentState = state.get();
-
-    if (!currentState[name]) {
-      state.set({ [name]: {} });
-      listeners.set({
-        [name]: {
-          [KEY]: new Set(),
-        },
-      });
-      listeners4Validate.set({
-        [name]: {},
+  const useForm: UseFormInterface = (formName) => {
+    let currentFormListeners = formsListeners.get(formName);
+    if (!currentFormListeners[KEY]) {
+      formsListeners.set(formName, {
+        [KEY]: new Set(),
       });
     }
     // 取值
-    const get: GetInterface = (path) => {
-      let currentState = state.get();
-      if (Array.isArray(path)) {
-        let fieldValue = path.reduce((prev = {}, cur, index) => {
-          return prev[cur];
-        }, currentState[name]);
-        return fieldValue;
+    const get: GetInterface = (fieldName) => {
+      let currentFormState = formsState.get(formName);
+      if (utils.isNone(fieldName)) {
+        return currentFormState;
+      }
+      if (utils.isArray(fieldName)) {
+        if (fieldName.length === 0) {
+          return currentFormState;
+        }
+        if (fieldName.length === 1) {
+          return utils.getValue(fieldName[0], currentFormState);
+        } else {
+          return fieldName.map((fieldKey) => {
+            return utils.getValue(fieldKey, currentFormState);
+          });
+        }
       } else {
-        return currentState[name];
+        throw new Error("fieldName must be array or undefined!");
       }
     };
     // 设值
-    const set: SetInterface = (nextFieldsValue) => {
-      let currentState = state.get();
-      let currentListeners = listeners.get();
-
-      Object.keys(nextFieldsValue).forEach((fieldNamePath) => {
-        let namePath = convertName(fieldNamePath) as NamePath;
-        let nextValue = nextFieldsValue[fieldNamePath];
-        let lastIndex = namePath.length - 1;
-        namePath.reduce((prev, cur, index) => {
-          if (index === lastIndex) {
-            if (
-              Object.prototype.toString.call(nextValue) === "[object Object]"
-            ) {
-              prev[cur] = {
-                ...prev[cur],
-                ...nextValue,
-              };
-            } else {
-              prev[cur] = nextValue;
-            }
-          }
-          if (!prev[cur] && index !== lastIndex) {
-            prev[cur] = {};
-          }
-          return prev[cur];
-        }, currentState[name]);
-        let stringifyPath = convertName(namePath) as string;
-        // 订阅了当前修改字段的变化，通知其更新
-        if (currentListeners[name][stringifyPath]) {
-          currentListeners[name][stringifyPath].forEach(
-            (listener: (values: any, fieldValue: any) => void) =>
-              listener(currentState[name], get(namePath))
-          );
+    const set: SetInterface = (fieldsValue) => {
+      let currentFormState = formsState.get(formName);
+      const { formListenersTrigger, fieldListenersTrigger } = listenerTrigger();
+      if (utils.isObject(fieldsValue)) {
+        const { fieldName, value } = fieldsValue as FieldValueType;
+        if (fieldName === formName) {
+          formsState.set(formName, value);
+          // 触发表单监听器，并更新当前表单的状态
+          formListenersTrigger(true);
+        } else {
+          utils.setValue(currentFormState, fieldsValue as FieldValueType);
+          // 触发订阅了当前字段的监听器，并更新当前字段的状态
+          fieldListenersTrigger(fieldsValue as FieldValueType);
         }
-      });
-      // 如果订阅了表单变化，通知其更新 注：如果即订阅了表单又订阅了当前表单中字段变化会造成二次渲染
-      if (currentListeners[name][KEY] && currentListeners[name][KEY].size > 0) {
-        currentListeners[name][KEY].forEach((listener: (values: any) => void) =>
-          listener(currentState[name])
-        );
       }
+      if (utils.isArray(fieldsValue)) {
+        fieldsValue.forEach((fieldValue) => {
+          const { fieldName, value } = fieldValue as FieldValueType;
+          if (fieldName === formName) {
+            formsState.set(formName, value);
+            // 触发表单监听器，并更新当前表单的状态
+            formListenersTrigger(true);
+          } else {
+            utils.setValue(currentFormState, fieldValue as FieldValueType);
+            // 触发订阅了当前字段的监听器，并更新当前字段的状态
+            fieldListenersTrigger(fieldValue as FieldValueType);
+          }
+        });
+      }
+      // 如果订阅了表单变化，通知其更新
+      formListenersTrigger(false);
     };
     // 移除
-    const remove: RemoveInterface = (path) => {
-      let currentState = state.get();
-      let currentListeners = listeners.get();
+    const remove: RemoveInterface = (fieldsName) => {
+      let currentFormState = formsState.get(formName);
+      const { formListenersTrigger, fieldListenersTrigger } = listenerTrigger();
 
-      if (Array.isArray(path)) {
-        let nextNamePath = [...path];
-        let currentName = nextNamePath.pop();
-        if (nextNamePath.length > 0) {
-          let parentValue = get(nextNamePath);
-          if (!parentValue) {
-            return Promise.resolve();
-          }
-          if (
-            Object.prototype.toString.call(parentValue) === "[object Object]"
-          ) {
-            if (parentValue[currentName as string]) {
-              delete parentValue[currentName as string];
-            } else {
-              return Promise.resolve();
-            }
-          }
-          if (Array.isArray(parentValue)) {
-            parentValue.splice(currentName as number, 1);
-          }
-          // 通知当前字段父级变化
-          let patentNamePath = convertName(nextNamePath) as string;
-          if (
-            currentListeners[name][patentNamePath] &&
-            currentListeners[name][patentNamePath].size > 0
-          ) {
-            currentListeners[name][patentNamePath].forEach(
-              (listener: (values: any) => void) => listener(currentState[name])
-            );
-          }
-        } else {
-          if (currentState[name][currentName as string]) {
-            delete currentState[name][currentName as string];
-            // 通知当前字段所在表单变化
-            if (
-              currentListeners[name][KEY] &&
-              currentListeners[name][KEY].size > 0
-            ) {
-              currentListeners[name][KEY].forEach(
-                (listener: (values: any, state?: "update") => void) =>
-                  listener(currentState[name], "update")
-              );
-            }
-          }
-        }
-      } else {
-        currentState[name] = {};
-        // 通知当前字段父级变化
-        if (
-          currentListeners[name][KEY] &&
-          currentListeners[name][KEY].size > 0
-        ) {
-          currentListeners[name][KEY].forEach(
-            (listener: (values: any) => void) => listener(currentState[name])
-          );
-        }
+      if (utils.isNone(fieldsName)) {
+        formsState.set(formName, {});
+        // 触发表单监听器，并更新当前表单的状态
+        formListenersTrigger(true);
       }
-      return Promise.resolve();
+
+      if (utils.isArray(fieldsName)) {
+        fieldsName.forEach((fieldName) => {
+          let parentFieldPath = utils.removeValue(currentFormState, fieldName);
+          if (parentFieldPath && parentFieldPath.length > 0) {
+            // 触发订阅了当前字段的父级字段监听器，并更新当前字段的状态
+            let parentFieldValue = utils.getValue(
+              parentFieldPath,
+              currentFormState
+            );
+            fieldListenersTrigger({
+              fieldName: parentFieldPath,
+              value: parentFieldValue,
+            });
+          } else {
+            // 触发表单监听器，并更新当前表单的状态
+            formListenersTrigger(true);
+          }
+        });
+      }
     };
     // 设置初始值
     const setInitialValue: SetInterface = (initialValue) => {
-      formInitialValue[name] = JSON.stringify(initialValue);
+      formInitialValue[formName] = JSON.stringify(initialValue);
     };
     // 重置
     const reset: ResetInterface = () => {
-      if (formInitialValue[name]) {
+      if (formInitialValue[formName]) {
         try {
-          set(JSON.parse(formInitialValue[name]));
+          let formValue = JSON.parse(formInitialValue[formName]);
+          set({
+            fieldName: formName,
+            value: formValue,
+          });
         } catch (error) {
           throw new Error(error as string);
         }
       } else {
-        set({});
+        set({
+          fieldName: formName,
+          value: {},
+        });
       }
     };
     // 订阅 => 取消订阅
@@ -184,50 +153,70 @@ const createFormAPI: () => FormAPIType = () => {
         () => void
       ];
 
-      const { paths, listener } = options;
+      const { fieldsName, listener } = options;
 
       let nextListener = listener ? listener : forceUpdate;
 
       useEffect(() => {
-        let currentListeners = listeners.get();
-        let unsubscribe: () => void;
+        let currentFormListeners = formsListeners.get(formName);
+        let unsubscribe: () => void = () => {};
 
-        if (Array.isArray(paths)) {
-          paths.forEach((path) => {
-            let namePath = convertName(path) as string;
-            if (!currentListeners[name][namePath]) {
-              currentListeners[name][namePath] = new Set();
+        if (utils.isNone(fieldsName)) {
+          if (currentFormListeners[KEY]) {
+            currentFormListeners[KEY].add(nextListener);
+          } else {
+            currentFormListeners[KEY] = new Set();
+            currentFormListeners[KEY].add(nextListener);
+          }
+          unsubscribe = () => {
+            if (currentFormListeners && currentFormListeners[KEY]) {
+              currentFormListeners[KEY].delete(nextListener);
             }
-            currentListeners[name][namePath].add(nextListener);
+            formsDestroy(formName);
+          };
+        }
+
+        if (utils.isArray(fieldsName)) {
+          fieldsName.forEach((fieldName) => {
+            if (fieldName === formName) {
+              if (currentFormListeners[KEY]) {
+                currentFormListeners[KEY].add(nextListener);
+              } else {
+                currentFormListeners[KEY] = new Set();
+                currentFormListeners[KEY].add(nextListener);
+              }
+            } else {
+              let namePath = utils.getFieldNamePath(formName);
+              if (namePath) {
+                if (!currentFormListeners[namePath]) {
+                  currentFormListeners[namePath] = new Set();
+                }
+                currentFormListeners[namePath].add(nextListener);
+              }
+            }
           });
           unsubscribe = () => {
-            paths.forEach((path) => {
-              let namePath = convertName(path) as string;
-              if (
-                currentListeners[name] &&
-                currentListeners[name][namePath] &&
-                currentListeners[name][namePath].size > 0
-              ) {
-                currentListeners[name][namePath].delete(nextListener);
+            fieldsName.forEach((fieldName) => {
+              if (fieldName === formName) {
+                if (currentFormListeners && currentFormListeners[KEY]) {
+                  currentFormListeners[KEY].delete(nextListener);
+                }
+                formsDestroy(formName);
               } else {
-                // 如果当前字段没有订阅者，则移除当前字段
-                destroy(name);
+                let namePath = utils.getFieldNamePath(formName);
+                if (
+                  namePath &&
+                  currentFormListeners &&
+                  currentFormListeners[namePath] &&
+                  currentFormListeners[namePath].size > 0
+                ) {
+                  currentFormListeners[namePath].delete(nextListener);
+                } else {
+                  // 如果当前字段没有订阅者，则移除当前字段
+                  formsDestroy(formName);
+                }
               }
             });
-          };
-        } else {
-          if (currentListeners[name][KEY]) {
-            currentListeners[name][KEY].add(nextListener);
-          } else {
-            currentListeners[name][KEY] = new Set();
-            currentListeners[name][KEY].add(nextListener);
-          }
-
-          unsubscribe = () => {
-            if (currentListeners[name] && currentListeners[name][KEY]) {
-              currentListeners[name][KEY].delete(nextListener);
-            }
-            destroy(name);
           };
         }
         return unsubscribe;
@@ -235,17 +224,19 @@ const createFormAPI: () => FormAPIType = () => {
     };
     // 触发表单校验
     const validate: ValidateInterface = (paths) => {
-      let currentState = state.get();
-      let currentListeners4Validate = listeners4Validate.get();
+      let currentFormState = formsState.get(formName);
+      let currentFormListeners4Validate = formsListeners4Validate.get(formName);
 
       if (Array.isArray(paths)) {
         let nextListener = paths
-          .map((path) => convertName(path) as string)
-          .filter((path) => !!currentListeners4Validate[name][path])
           .map((path) => {
-            return currentListeners4Validate[name][path](
-              get(convertName(path) as NamePath),
-              currentState[name]
+            return utils.getFieldNamePath(formName);
+          })
+          .filter((path) => path && !!currentFormListeners4Validate[path])
+          .map((path) => {
+            return currentFormListeners4Validate[path as string](
+              get(convertName(path as string) as any),
+              currentFormState
             );
           });
         return Promise.allSettled(nextListener).then((results) => {
@@ -259,7 +250,7 @@ const createFormAPI: () => FormAPIType = () => {
           }
         });
       } else {
-        let allListeners = Object.keys(currentListeners4Validate[name]).map(
+        let allListeners = Object.keys(currentFormListeners4Validate).map(
           (path) => convertName(path) as NamePath
         );
         return validate(allListeners);
@@ -273,20 +264,21 @@ const createFormAPI: () => FormAPIType = () => {
       const { paths, listener } = options;
 
       return useEffect(() => {
-        let currentListeners4Validate = listeners4Validate.get();
+        let currentFormListeners4Validate =
+          formsListeners4Validate.get(formName);
         let unsubscribe: () => void = () => {};
 
         if (Array.isArray(paths)) {
           paths.forEach((path) => {
             let stringifyPath = convertName(path) as string;
-            currentListeners4Validate[name][stringifyPath] = listener;
+            currentFormListeners4Validate[stringifyPath] = listener;
           });
 
           unsubscribe = () => {
-            if (currentListeners4Validate[name]) {
+            if (currentFormListeners4Validate) {
               paths.forEach((path) => {
                 let stringifyPath = convertName(path) as string;
-                delete currentListeners4Validate[name][stringifyPath];
+                delete currentFormListeners4Validate[stringifyPath];
               });
             }
           };
@@ -295,8 +287,47 @@ const createFormAPI: () => FormAPIType = () => {
         return unsubscribe;
       }, []);
     };
+    /**
+     * 触发订阅字段
+     *
+     */
+    const listenerTrigger = () => {
+      let currentFormState = formsState.get(formName);
+      let currentFormListeners = formsListeners.get(formName);
+      const formListenersTrigger = (isUpdate: boolean) => {
+        // 如果订阅了表单变化，通知其更新
+        if (currentFormListeners[KEY] && currentFormListeners[KEY].size > 0) {
+          currentFormListeners[KEY].forEach(
+            (listener: SubscribeOptionsType["listener"]) =>
+              listener &&
+              listener(
+                currentFormState,
+                currentFormState,
+                isUpdate ? "update" : "static"
+              )
+          );
+        }
+      };
+      const fieldListenersTrigger = (fieldValue: FieldValueType) => {
+        const { fieldName, value } = fieldValue as FieldValueType;
+        let currentFieldNamePath = utils.getFieldNamePath(fieldName);
+        if (
+          currentFieldNamePath &&
+          currentFormListeners[currentFieldNamePath]
+        ) {
+          currentFormListeners[currentFieldNamePath].forEach(
+            (listener: SubscribeOptionsType["listener"]) =>
+              listener && listener(value, currentFormState)
+          );
+        }
+      };
+      return {
+        formListenersTrigger,
+        fieldListenersTrigger,
+      };
+    };
     return {
-      name: name,
+      name: formName,
       set,
       get,
       remove,

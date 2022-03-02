@@ -109,15 +109,19 @@ export type ListenersType = {
   [k: string]: any;
 };
 
-export type NamePath = (string | number)[];
+export type NamePath = string | number | (string | number)[];
 
 export type NamesPath = NamePath[];
 
 export type NamePathType = number | string | NamePath;
 
-type SubscribeOptionsType = {
-  paths?: NamesPath;
-  listener?: any;
+export type SubscribeOptionsType = {
+  fieldsName?: NamePath[];
+  listener?: (
+    fieldValue: any,
+    formValues: any,
+    state?: "update" | "static"
+  ) => void;
 };
 
 type ItemType = {
@@ -125,15 +129,19 @@ type ItemType = {
   convertName: ConvertNameInterface;
 };
 export interface GetInterface {
-  (path?: NamePath): { [k: string]: any };
+  (fieldsName?: NamePath[]): { [k: string]: any } | undefined;
 }
 
+export type FieldValueType = {
+  fieldName: NamePath;
+  value: any;
+};
 export interface SetInterface {
-  (nextContext: ValueType): void;
+  (fieldsValue: FieldValueType | FieldValueType[]): void;
 }
 
 export interface RemoveInterface {
-  (path?: NamePath): Promise<void>;
+  (fieldsName?: NamePath[]): void;
 }
 
 export interface ResetInterface {
