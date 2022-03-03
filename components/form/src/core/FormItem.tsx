@@ -1,7 +1,6 @@
 import React, { FC, useContext } from "react";
 import { FormContext, ItemContext } from "./context";
 import type {
-  NamePath,
   FieldNamePath,
   WrapperItemType,
   WrapperValidationType,

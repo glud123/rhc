@@ -79,6 +79,7 @@ const createFormAPI: () => FormAPIType = () => {
     const set: SetInterface = (fieldsValue) => {
       let currentFormState = formsState.get(formName);
       const { formListenersTrigger, fieldListenersTrigger } = listenerTrigger();
+      // 单个字段设值
       if (utils.isObject(fieldsValue)) {
         const { fieldName, value } = fieldsValue as FieldValueType;
         if (fieldName === formName) {
@@ -91,6 +92,7 @@ const createFormAPI: () => FormAPIType = () => {
           fieldListenersTrigger(fieldsValue as FieldValueType);
         }
       }
+      // 多个字段设值
       if (utils.isArray(fieldsValue)) {
         fieldsValue.forEach((fieldValue) => {
           const { fieldName, value } = fieldValue as FieldValueType;
@@ -206,12 +208,12 @@ const createFormAPI: () => FormAPIType = () => {
                 currentFormListeners[KEY].add(nextListener);
               }
             } else {
-              let namePath = utils.ArrayToJSONString(formName);
-              if (namePath) {
-                if (!currentFormListeners[namePath]) {
-                  currentFormListeners[namePath] = new Set();
+              const fieldNamePath = utils.ArrayToJSONString(fieldName);
+              if (fieldNamePath) {
+                if (!currentFormListeners[fieldNamePath]) {
+                  currentFormListeners[fieldNamePath] = new Set();
                 }
-                currentFormListeners[namePath].add(nextListener);
+                currentFormListeners[fieldNamePath].add(nextListener);
               }
             }
           });
@@ -223,14 +225,14 @@ const createFormAPI: () => FormAPIType = () => {
                 }
                 formsDestroy(formName);
               } else {
-                let namePath = utils.ArrayToJSONString(formName);
+                const fieldNamePath = utils.ArrayToJSONString(fieldName);
                 if (
-                  namePath &&
+                  fieldNamePath &&
                   currentFormListeners &&
-                  currentFormListeners[namePath] &&
-                  currentFormListeners[namePath].size > 0
+                  currentFormListeners[fieldNamePath] &&
+                  currentFormListeners[fieldNamePath].size > 0
                 ) {
-                  currentFormListeners[namePath].delete(nextListener);
+                  currentFormListeners[fieldNamePath].delete(nextListener);
                 } else {
                   // 如果当前字段没有订阅者，则移除当前字段
                   formsDestroy(formName);
