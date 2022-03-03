@@ -32,8 +32,6 @@ const FormCore: FC<FormCorePropsInterface> = (props) => {
       wrapperItem,
       wrapperValidation,
     },
-    state: { isEdit: true },
-    store: {},
   });
 
   const listener = useCallback((_, state) => {

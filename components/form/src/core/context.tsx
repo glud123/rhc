@@ -11,11 +11,7 @@ import type {
  * 表单上下文
  */
 export const FormContext = React.createContext<FormContextType>({
-  formStore: {
-    state: {
-      isEdit: true,
-    },
-  },
+  formStore: {},
   dispatch: () => {},
 } as any);
 
@@ -32,21 +28,33 @@ export const formReducer: FormReducerInterface = (state, action) => {
   switch (type) {
     case FormActionEnum.Form:
       return { ...state, form: data as FormInstanceType };
-    case FormActionEnum.State:
-      return { ...state, state: { ...state["state"], ...data } };
+    // case FormActionEnum.State:
+    //   return { ...state, state: { ...state["state"], ...data } };
     case FormActionEnum.Update:
       return { ...state };
     case FormActionEnum.Wrapper:
       return { ...state, wrapper: data as WrapperType };
     default:
-      return { ...state, store: { ...state["store"], ...data } };
+      return { ...state };
+    // return { ...state, store: { ...state["store"], ...data } };
   }
 };
 
 type __FORM_STORE__type = {
+  // 表单字段数据集合
   _state: { [k: string]: any };
+  // 表单字段监听器集合
   _listeners: { [k: string]: any };
+  // 表单字段校验监听器集合
   _listeners4Validate: { [k: string]: any };
+  // 表单状态集合
+  _state4Form: { [k: string]: any };
+  // 表单字状态监听器集合
+  _listeners4FormState: { [k: string]: any };
+  // 表单提供的数据仓库集合
+  _store: { [k: string]: any };
+  // 表单提供的数据仓库监听器集合
+  _listeners4Store: { [k: string]: any };
 };
 
 interface createFormStoreInterface {
@@ -63,19 +71,51 @@ interface createFormStoreInterface {
       get: (formName: string) => { [k: string]: any };
       set: (formName: string, nextListeners4Validate: any) => void;
     };
+    formsState4Form: {
+      get: (formName: string) => { [k: string]: any };
+      set: (formName: string, nextState: any) => void;
+    };
+    formsListeners4FormState: {
+      get: (formName: string) => { [k: string]: any };
+      set: (formName: string, nextState: any) => void;
+    };
+    formsStore: {
+      get: (formName: string) => { [k: string]: any };
+      set: (formName: string, nextState: any) => void;
+    };
+    formsListeners4Store: {
+      get: (formName: string) => { [k: string]: any };
+      set: (formName: string, nextState: any) => void;
+    };
     formsDestroy: (formName: string) => void;
   };
 }
 
 /**
  * 表单数据仓库
- * 其中包含所有表单的状态（_state）、监听器（_listeners）、验证监听器（_listeners4Validate）
+ *
+ * 表单字段相关数据：
+ * - 表单的字段状态( _state )
+ * - 表单的字段状态监听器( _listeners )
+ * - 表单的字段验证监听器( _listeners4Validate )
+ *
+ * 表单基础状态先关数据：
+ * - 表单基础状态( _state4Form )
+ * - 表单基础状态监听器( _listeners4FormState )
+ *
+ * 表单提供的数据仓库：
+ * - 表单提供的数据仓库( _store )
+ * - 表单提供的数据仓库监听器( _listeners4Store )
  */
 
 let __FORM_STORE__: __FORM_STORE__type = {
   _state: {},
   _listeners: {},
   _listeners4Validate: {},
+  _state4Form: {},
+  _listeners4FormState: {},
+  _store: {},
+  _listeners4Store: {},
 };
 
 /**
@@ -85,7 +125,7 @@ let __FORM_STORE__: __FORM_STORE__type = {
  * 同时，提供 destroy 方法，用于销毁所有数据类型下某个表单的数据
  *
  * @example
- * // 示例: 
+ * // 示例:
  * // 对表单 'form1' 的状态（_state）、监听器（_listeners）、验证监听器（_listeners4Validate）进行取值设值
  * const {formsState, formsListeners, formsListeners4Validate, formsDestroy} = createFormStore();
  * // 获取表单 'form1' 的状态
@@ -100,7 +140,7 @@ let __FORM_STORE__: __FORM_STORE__type = {
  * formsDestroy('form1');
  * // form1 的 state ==> {}
  * // form1 的 listeners ==> {}
- * 
+ *
  */
 export const createFormStore: createFormStoreInterface = () => {
   const get = (key: keyof __FORM_STORE__type, formName: string) => {
@@ -144,6 +184,25 @@ export const createFormStore: createFormStoreInterface = () => {
       get: (formName) => get("_listeners4Validate", formName),
       set: (formName, nextListeners4Validate) =>
         set("_listeners4Validate", formName, nextListeners4Validate),
+    },
+    formsState4Form: {
+      get: (formName) => get("_state4Form", formName),
+      set: (formName, nextListeners) =>
+        set("_state4Form", formName, nextListeners),
+    },
+    formsListeners4FormState: {
+      get: (formName) => get("_listeners4FormState", formName),
+      set: (formName, nextListeners) =>
+        set("_listeners4FormState", formName, nextListeners),
+    },
+    formsStore: {
+      get: (formName) => get("_store", formName),
+      set: (formName, nextListeners) => set("_store", formName, nextListeners),
+    },
+    formsListeners4Store: {
+      get: (formName) => get("_listeners4Store", formName),
+      set: (formName, nextListeners) =>
+        set("_listeners4Store", formName, nextListeners),
     },
     formsDestroy: destroy,
   };

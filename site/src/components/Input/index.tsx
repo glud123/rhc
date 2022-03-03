@@ -6,10 +6,14 @@ interface InputProps {
   onChange?: (v: string) => void;
   type?: "text" | "number";
   placeholder?: string;
+  disabled?: boolean;
 }
 
 const Input: FC<InputProps> = (props) => {
-  const { value = "", onChange, type = "text", placeholder } = props;
+  const { value = "", onChange, type = "text", placeholder, disabled } = props;
+
+  console.log(disabled);
+  
 
   const styles = useStyles();
 
@@ -19,6 +23,7 @@ const Input: FC<InputProps> = (props) => {
 
   return (
     <input
+      disabled={disabled}
       className={styles.input}
       type={type}
       value={value}

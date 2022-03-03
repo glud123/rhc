@@ -170,3 +170,42 @@ export const JSONStringToArray: (stringPath: string) => (string | number)[] = (
   }
   return arrayPath;
 };
+
+type ListenerOperationType = {
+  addListener: (key: string, callback: (...args: any[]) => void) => void;
+  removeListener: (key: string, callback: (...args: any[]) => void) => number;
+  triggerListener: (key: string, ...args: any[]) => void;
+};
+/**
+ * 创建监听器操作方法
+ * @param {any} listener
+ */
+export const listenerOperation: (listener: any) => ListenerOperationType = (
+  listener
+) => {
+  const addListener = (key: string, callback: (...args: any[]) => void) => {
+    if (isNone(listener[key])) {
+      listener[key] = new Set();
+    }
+    listener[key].add(callback);
+  };
+  const removeListener = (key: string, callback: (...args: any[]) => void) => {
+    if (listener[key] && listener[key].has(callback)) {
+      listener[key].delete(callback);
+    }
+    return listener[key].size;
+  };
+  const triggerListener = (key: string, ...args: any[]) => {
+    if (!isNone(listener[key])) {
+      return [...listener[key]].map(
+        (listenerItem: (...args: any[]) => any) =>
+          listenerItem && listenerItem(...args)
+      );
+    }
+  };
+  return {
+    addListener,
+    removeListener,
+    triggerListener,
+  };
+};

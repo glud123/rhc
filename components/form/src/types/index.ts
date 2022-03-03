@@ -33,6 +33,11 @@ export type FormInstanceType = {
   subscribe: SubscribeInterface;
   validate: ValidateInterface;
   subscribeValidate: SubscribeValidateInterface;
+  setState: SetStateInterface;
+  subscribeState: SubscribeStateInterface;
+  getStore: GetSoreInterface;
+  setStore: SetSoreInterface;
+  subscribeSore: SubscribeSoreInterface;
   getFieldName: GetNameInterface;
 };
 
@@ -74,14 +79,12 @@ export type StoreType = {
  * 表单容器数据状态
  * @param {FormInstanceType} form 表单实例
  * @param {WrapperType} wrapper 表单项渲染容器
- * @param {StateType} state 表单状态
- * @param {StoreType} store 表单容器范围内自定义数据存储
+//  * @param {StateType} state 表单状态
+//  * @param {StoreType} store 表单容器范围内自定义数据存储
  */
 export type FormContextStoreType = {
   form: FormInstanceType;
   wrapper: WrapperType;
-  state: StateType;
-  store: StoreType;
 };
 
 type FormReducerActionType = {
@@ -147,10 +150,6 @@ export interface SubscribeInterface {
   (options?: SubscribeOptionsType): void;
 }
 
-export interface useFormContextInterface {
-  (): [StoreType, (state: StoreType) => void];
-}
-
 export interface UseFormInterface {
   (name: string): FormInstanceType;
 }
@@ -170,9 +169,36 @@ export interface ValidateInterface {
 
 export type FormAPIType = {
   useForm: UseFormInterface;
-  useFormContext: useFormContextInterface;
 };
 
 export interface GetNameInterface {
   (pathOffset?: number): NamePathArray;
+}
+
+export type FormStateType = {
+  disabled: boolean;
+};
+
+export interface SubscribeStateInterface {
+  (): FormStateType;
+}
+
+export interface SetStateInterface {
+  (state: FormStateType): void;
+}
+
+type StoreListenerType = {
+  name: string;
+  listener?: (value: any) => void;
+};
+export interface SubscribeSoreInterface {
+  (storeListener: StoreListenerType): StoreType;
+}
+
+export interface SetSoreInterface {
+  (storeValue: StoreType): void;
+}
+
+export interface GetSoreInterface {
+  (names?: string | string[]): StoreType;
 }

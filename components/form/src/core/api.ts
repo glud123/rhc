@@ -15,27 +15,31 @@ import {
   SubscribeValidateInterface,
   GetNameInterface,
   NamePathArray,
-  useFormContextInterface,
   StoreType,
   FieldValueType,
-  SubscribeOptionsType,
+  FormStateType,
+  SetStateInterface,
+  SubscribeStateInterface,
+  SubscribeSoreInterface,
+  SetSoreInterface,
+  GetSoreInterface,
 } from "../types";
 
 const createFormAPI: () => FormAPIType = () => {
   let formInitialValue: ValueType = {};
 
-  const { formsState, formsListeners, formsListeners4Validate, formsDestroy } =
-    createFormStore();
-
-  const KEY = Symbol("form") as any;
+  const {
+    formsState,
+    formsListeners,
+    formsListeners4Validate,
+    formsState4Form,
+    formsListeners4FormState,
+    formsStore,
+    formsListeners4Store,
+    formsDestroy,
+  } = createFormStore();
 
   const useForm: UseFormInterface = (formName) => {
-    let currentFormListeners = formsListeners.get(formName);
-    if (!currentFormListeners[KEY]) {
-      formsListeners.set(formName, {
-        [KEY]: new Set(),
-      });
-    }
     /**
      * 表单取值 api
      * @param {FieldNamePath[] | undefined} fieldName 需要设置的字段名称或名称路径及值
@@ -183,60 +187,41 @@ const createFormAPI: () => FormAPIType = () => {
       let nextListener = listener ? listener : forceUpdate;
       useEffect(() => {
         let currentFormListeners = formsListeners.get(formName);
+        const { addListener, removeListener } =
+          utils.listenerOperation(currentFormListeners);
         let unsubscribe: () => void = () => {};
         if (utils.isNone(fieldsName)) {
-          if (currentFormListeners[KEY]) {
-            currentFormListeners[KEY].add(nextListener);
-          } else {
-            currentFormListeners[KEY] = new Set();
-            currentFormListeners[KEY].add(nextListener);
-          }
+          addListener(formName, nextListener);
           unsubscribe = () => {
-            if (currentFormListeners && currentFormListeners[KEY]) {
-              currentFormListeners[KEY].delete(nextListener);
+            const currentListenerNumber = removeListener(
+              formName,
+              nextListener
+            );
+            if (currentListenerNumber === 0) {
+              formsDestroy(formName);
             }
-            formsDestroy(formName);
           };
         }
         if (utils.isArray(fieldsName)) {
           fieldsName.forEach((fieldName) => {
-            if (fieldName === formName) {
-              if (currentFormListeners[KEY]) {
-                currentFormListeners[KEY].add(nextListener);
-              } else {
-                currentFormListeners[KEY] = new Set();
-                currentFormListeners[KEY].add(nextListener);
-              }
-            } else {
-              const fieldNamePath = utils.ArrayToJSONString(fieldName);
-              if (fieldNamePath) {
-                if (!currentFormListeners[fieldNamePath]) {
-                  currentFormListeners[fieldNamePath] = new Set();
-                }
-                currentFormListeners[fieldNamePath].add(nextListener);
-              }
-            }
+            const listenerName =
+              fieldName === formName
+                ? formName
+                : utils.ArrayToJSONString(fieldName);
+            addListener(listenerName, nextListener);
           });
           unsubscribe = () => {
             fieldsName.forEach((fieldName) => {
-              if (fieldName === formName) {
-                if (currentFormListeners && currentFormListeners[KEY]) {
-                  currentFormListeners[KEY].delete(nextListener);
-                }
-                formsDestroy(formName);
-              } else {
-                const fieldNamePath = utils.ArrayToJSONString(fieldName);
-                if (
-                  fieldNamePath &&
-                  currentFormListeners &&
-                  currentFormListeners[fieldNamePath] &&
-                  currentFormListeners[fieldNamePath].size > 0
-                ) {
-                  currentFormListeners[fieldNamePath].delete(nextListener);
-                } else {
-                  // 如果当前字段没有订阅者，则移除当前字段
-                  formsDestroy(formName);
-                }
+              const listenerName =
+                fieldName === formName
+                  ? formName
+                  : utils.ArrayToJSONString(fieldName);
+              const currentListenerNumber = removeListener(
+                listenerName,
+                nextListener
+              );
+              if (currentListenerNumber === 0) {
+                formsDestroy(listenerName);
               }
             });
           };
@@ -252,6 +237,9 @@ const createFormAPI: () => FormAPIType = () => {
     const validate: ValidateInterface = (paths) => {
       let currentFormState = formsState.get(formName);
       let currentFormListeners4Validate = formsListeners4Validate.get(formName);
+      const { triggerListener } = utils.listenerOperation(
+        currentFormListeners4Validate
+      );
       if (utils.isArray(paths)) {
         let nextListener = paths
           .map((path) => {
@@ -260,10 +248,7 @@ const createFormAPI: () => FormAPIType = () => {
           .filter((path) => path && !!currentFormListeners4Validate[path])
           .map((path) => {
             let fieldValue = get(utils.JSONStringToArray(path));
-            return currentFormListeners4Validate[path as string](
-              fieldValue,
-              currentFormState
-            );
+            return triggerListener(path, fieldValue, currentFormState);
           });
         return Promise.allSettled(nextListener).then((results) => {
           let rejecteds = results
@@ -288,30 +273,144 @@ const createFormAPI: () => FormAPIType = () => {
      */
     const subscribeValidate: SubscribeValidateInterface = (options) => {
       const { paths, listener } = options;
-      return useEffect(() => {
+      useEffect(() => {
         let currentFormListeners4Validate =
           formsListeners4Validate.get(formName);
+        const { addListener, removeListener } = utils.listenerOperation(
+          currentFormListeners4Validate
+        );
         let unsubscribe: () => void = () => {};
         if (utils.isArray(paths)) {
           paths.forEach((path) => {
-            let stringifyPath = utils.ArrayToJSONString(path);
-            if (!utils.isNone(stringifyPath)) {
-              currentFormListeners4Validate[stringifyPath] = listener;
-            }
+            const stringifyPath = utils.ArrayToJSONString(path);
+            addListener(stringifyPath, listener);
           });
           unsubscribe = () => {
             if (currentFormListeners4Validate) {
               paths.forEach((path) => {
                 let stringifyPath = utils.ArrayToJSONString(path);
-                if (!utils.isNone(stringifyPath)) {
-                  delete currentFormListeners4Validate[stringifyPath];
-                }
+                removeListener(stringifyPath, listener);
               });
             }
           };
         }
         return unsubscribe;
       }, []);
+    };
+    /**
+     * 设置表单基础状态
+     * 状态清单：
+     * @param {boolean} disabled 表单是否可用
+     */
+    const setState: SetStateInterface = (state) => {
+      // 单个字段设值
+      if (utils.isObject(state)) {
+        let currentformsState4Form = formsState4Form.get(formName);
+        Object.keys(state).forEach((item) => {
+          utils.setValue(currentformsState4Form, {
+            fieldName: item,
+            value: (state as any)[item],
+          } as FieldValueType);
+        });
+        let currentFormsListeners4FormState =
+          formsListeners4FormState.get(formName);
+        const { triggerListener } = utils.listenerOperation(
+          currentFormsListeners4FormState
+        );
+        triggerListener(formName);
+      }
+    };
+    /**
+     * 表单基础状态 订阅 => 取消订阅
+     * @returns {FormStateType} 表单基础状态
+     */
+    const subscribeState: SubscribeStateInterface = () => {
+      const [, forceUpdate] = useReducer((c) => c + 1, 0) as [
+        never,
+        () => void
+      ];
+      useEffect(() => {
+        let currentFormsListeners4FormState =
+          formsListeners4FormState.get(formName);
+        const { addListener, removeListener } = utils.listenerOperation(
+          currentFormsListeners4FormState
+        );
+        let unsubscribe: () => void = () => {};
+        addListener(formName, forceUpdate);
+        unsubscribe = () => {
+          removeListener(formName, forceUpdate);
+        };
+        return unsubscribe;
+      }, []);
+      return formsState4Form.get(formName) as FormStateType;
+    };
+    /**
+     * 表单提供出来的数据仓库
+     */
+    const getStore: GetSoreInterface = (names) => {
+      let currentFormStore = formsStore.get(formName);
+      if (utils.isNone(names)) {
+        return currentFormStore;
+      }
+      if (utils.isString(names)) {
+        return utils.getValue(names, currentFormStore);
+      }
+      if (utils.isArray(names)) {
+        if (names.length === 0) {
+          return currentFormStore;
+        }
+        if (names.length === 1) {
+          return utils.getValue(names[0], currentFormStore);
+        } else {
+          return names.map((fieldKey) => {
+            return utils.getValue(fieldKey, currentFormStore);
+          });
+        }
+      } else {
+        throw new Error("fieldName must be array or undefined!");
+      }
+    };
+    /**
+     * 表单提供出来的数据仓库
+     */
+    const setStore: SetSoreInterface = (storeValue) => {
+      if (utils.isObject(storeValue)) {
+        let currentFormsStore = formsStore.get(formName);
+        const { triggerListener } = utils.listenerOperation(
+          formsListeners4Store.get(formName)
+        );
+        Object.keys(storeValue).forEach((item) => {
+          utils.setValue(currentFormsStore, {
+            fieldName: item,
+            value: (storeValue as any)[item],
+          } as FieldValueType);
+          triggerListener(item);
+        });
+      }
+    };
+    /**
+     * 表单数据仓库 订阅 => 取消订阅
+     * @returns {FormStateType} 表单数据仓库
+     */
+    const subscribeSore: SubscribeSoreInterface = (storeListener) => {
+      const { name, listener } = storeListener;
+      const [, forceUpdate] = useReducer((c) => c + 1, 0) as [
+        never,
+        () => void
+      ];
+      let currentListener = listener ? listener : forceUpdate;
+      useEffect(() => {
+        const { addListener, removeListener } = utils.listenerOperation(
+          formsListeners4Store.get(formName)
+        );
+        let unsubscribe: () => void = () => {};
+        addListener(name, currentListener);
+        unsubscribe = () => {
+          removeListener(name, currentListener);
+        };
+        return unsubscribe;
+      }, []);
+      return formsStore.get(name);
     };
     /**
      * 触发订阅字段
@@ -321,32 +420,20 @@ const createFormAPI: () => FormAPIType = () => {
     const listenerTrigger = () => {
       let currentFormState = formsState.get(formName);
       let currentFormListeners = formsListeners.get(formName);
+      const { triggerListener } = utils.listenerOperation(currentFormListeners);
       const formListenersTrigger = (isUpdate: boolean) => {
         // 如果订阅了表单变化，通知其更新
-        if (currentFormListeners[KEY] && currentFormListeners[KEY].size > 0) {
-          currentFormListeners[KEY].forEach(
-            (listener: SubscribeOptionsType["listener"]) =>
-              listener &&
-              listener(
-                currentFormState,
-                currentFormState,
-                isUpdate ? "update" : "static"
-              )
-          );
-        }
+        triggerListener(
+          formName,
+          currentFormState,
+          currentFormState,
+          isUpdate ? "update" : "static"
+        );
       };
       const fieldListenersTrigger = (fieldValue: FieldValueType) => {
         const { fieldName, value } = fieldValue as FieldValueType;
         let currentFieldNamePath = utils.ArrayToJSONString(fieldName);
-        if (
-          currentFieldNamePath &&
-          currentFormListeners[currentFieldNamePath]
-        ) {
-          currentFormListeners[currentFieldNamePath].forEach(
-            (listener: SubscribeOptionsType["listener"]) =>
-              listener && listener(value, currentFormState)
-          );
-        }
+        triggerListener(currentFieldNamePath, value, currentFormState);
       };
       return {
         formListenersTrigger,
@@ -361,24 +448,17 @@ const createFormAPI: () => FormAPIType = () => {
       reset,
       setInitialValue,
       subscribe,
-      subscribeValidate,
       validate,
+      subscribeValidate,
+      setState,
+      subscribeState,
+      getStore,
+      setStore,
+      subscribeSore,
       getFieldName: getName,
     };
   };
-  // 表单上下文hooks
-  const useFormContext: useFormContextInterface = () => {
-    const { formStore, dispatch } = useContext(FormContext);
-    const dispatchStore = (state: StoreType) => {
-      dispatch({
-        type: FormActionEnum.Store,
-        data: state,
-      });
-    };
-    return [formStore.store, dispatchStore];
-  };
-
-  return { useForm, useFormContext };
+  return { useForm };
 };
 
 export default createFormAPI;

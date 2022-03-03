@@ -21,6 +21,10 @@ const Example = () => {
     });
   };
 
+  const handleEdit = (edit: boolean) => {
+    form.setState({ disabled: edit });
+  };
+
   return (
     <div className={styles.example}>
       <Info>尝试对表单项进行操作，查看后续结果</Info>
@@ -48,7 +52,6 @@ const Example = () => {
           required
           rules={(value) => {
             console.log(value);
-
             if (value) {
               return Promise.resolve();
             } else {
@@ -75,6 +78,12 @@ const Example = () => {
         </Form.Item>
         <Button type="primary" onClick={handleSubmit}>
           submit
+        </Button>
+        <Button type="primary" onClick={() => handleEdit(false)}>
+          edit
+        </Button>
+        <Button type="primary" onClick={() => handleEdit(true)}>
+          disabled
         </Button>
       </Form>
     </div>

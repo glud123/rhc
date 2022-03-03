@@ -1,6 +1,6 @@
 import React, { FC, useContext } from "react";
 import { FormContext, ItemContext } from "./context";
-import type {
+import {
   FieldNamePath,
   WrapperItemType,
   WrapperValidationType,
@@ -34,11 +34,13 @@ const FormItem: FC<FormItemPropsInterface> = (props) => {
     return null;
   }
 
-  const { form, wrapper, state } = formStore;
+  const { form, wrapper } = formStore;
 
   let currentName = form.getFieldName().concat(name);
 
   form.subscribe({ fieldsName: currentName });
+
+  let formState = form.subscribeState();
 
   const handleChange = (v: any) => {
     form.set({ fieldName: currentName, value: v });
@@ -55,7 +57,7 @@ const FormItem: FC<FormItemPropsInterface> = (props) => {
         {
           form: form,
           name: name,
-          disabled: !state.isEdit,
+          disabled: formState.disabled,
           rules: rules,
           value: form.get(currentName),
           onChange: handleChange,
@@ -64,7 +66,7 @@ const FormItem: FC<FormItemPropsInterface> = (props) => {
       );
     } else {
       nextChildren = React.cloneElement(children as React.ReactElement, {
-        disabled: !state.isEdit,
+        disabled: formState.disabled,
         value: form.get(currentName),
         onChange: handleChange,
       });
