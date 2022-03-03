@@ -5,7 +5,6 @@ import {
   FormActionEnum,
   UseFormInterface,
   ValueType,
-  NamePathType,
   GetInterface,
   SetInterface,
   RemoveInterface,
@@ -15,8 +14,7 @@ import {
   FormAPIType,
   SubscribeValidateInterface,
   GetNameInterface,
-  ConvertNameInterface,
-  NamePath,
+  NamePathArray,
   useFormContextInterface,
   StoreType,
   FieldValueType,
@@ -38,20 +36,30 @@ const createFormAPI: () => FormAPIType = () => {
         [KEY]: new Set(),
       });
     }
-    // 取值
-    const get: GetInterface = (fieldName) => {
+    /**
+     * 表单取值 api
+     * @param {FieldNamePath[] | undefined} fieldName 需要设置的字段名称或名称路径及值
+     * @example
+     * // 1. 获取当前表单所有字段的值
+     * get();
+     * // 2. 获取单个字段的值
+     * get(['name']);
+     * // 3. 获取多个字段的值
+     * set([name", "age"]);
+     */
+    const get: GetInterface = (fieldsName) => {
       let currentFormState = formsState.get(formName);
-      if (utils.isNone(fieldName)) {
+      if (utils.isNone(fieldsName)) {
         return currentFormState;
       }
-      if (utils.isArray(fieldName)) {
-        if (fieldName.length === 0) {
+      if (utils.isArray(fieldsName)) {
+        if (fieldsName.length === 0) {
           return currentFormState;
         }
-        if (fieldName.length === 1) {
-          return utils.getValue(fieldName[0], currentFormState);
+        if (fieldsName.length === 1) {
+          return utils.getValue(fieldsName[0], currentFormState);
         } else {
-          return fieldName.map((fieldKey) => {
+          return fieldsName.map((fieldKey) => {
             return utils.getValue(fieldKey, currentFormState);
           });
         }
@@ -59,7 +67,15 @@ const createFormAPI: () => FormAPIType = () => {
         throw new Error("fieldName must be array or undefined!");
       }
     };
-    // 设值
+    /**
+     * 表单设值 api
+     * @param {FieldValueType | FieldValueType[]} fieldsValue 需要设置的字段名称或名称路径及值
+     * @example
+     * // 1. 设置单个字段的值
+     * set({fieldName: "name", value: "张三"});
+     * // 2. 设置多个字段的值
+     * set([{fieldName: "name", value: "张三"}, {fieldName: "age", value: 18}]);
+     */
     const set: SetInterface = (fieldsValue) => {
       let currentFormState = formsState.get(formName);
       const { formListenersTrigger, fieldListenersTrigger } = listenerTrigger();
@@ -92,17 +108,18 @@ const createFormAPI: () => FormAPIType = () => {
       // 如果订阅了表单变化，通知其更新
       formListenersTrigger(false);
     };
-    // 移除
+    /**
+     * 表单删除 api
+     * @param {FieldNamePath[] | undefined} fieldsName 要移除的表单字段名称或名称路径，不传则将当前表单数据清空
+     */
     const remove: RemoveInterface = (fieldsName) => {
       let currentFormState = formsState.get(formName);
       const { formListenersTrigger, fieldListenersTrigger } = listenerTrigger();
-
       if (utils.isNone(fieldsName)) {
         formsState.set(formName, {});
         // 触发表单监听器，并更新当前表单的状态
         formListenersTrigger(true);
       }
-
       if (utils.isArray(fieldsName)) {
         fieldsName.forEach((fieldName) => {
           let parentFieldPath = utils.removeValue(currentFormState, fieldName);
@@ -123,11 +140,16 @@ const createFormAPI: () => FormAPIType = () => {
         });
       }
     };
-    // 设置初始值
+    /**
+     * 设置表单初始值数据
+     */
     const setInitialValue: SetInterface = (initialValue) => {
       formInitialValue[formName] = JSON.stringify(initialValue);
     };
-    // 重置
+    /**
+     * 重置表单数据状态
+     * 将表单数据重置到初始值的状态
+     */
     const reset: ResetInterface = () => {
       if (formInitialValue[formName]) {
         try {
@@ -146,21 +168,20 @@ const createFormAPI: () => FormAPIType = () => {
         });
       }
     };
-    // 订阅 => 取消订阅
+    /**
+     * 表单数据状态 订阅 => 取消订阅
+     * @param {SubscribeOptionsType} options
+     */
     const subscribe: SubscribeInterface = (options = {}) => {
       const [, forceUpdate] = useReducer((c) => c + 1, 0) as [
         never,
         () => void
       ];
-
       const { fieldsName, listener } = options;
-
       let nextListener = listener ? listener : forceUpdate;
-
       useEffect(() => {
         let currentFormListeners = formsListeners.get(formName);
         let unsubscribe: () => void = () => {};
-
         if (utils.isNone(fieldsName)) {
           if (currentFormListeners[KEY]) {
             currentFormListeners[KEY].add(nextListener);
@@ -175,7 +196,6 @@ const createFormAPI: () => FormAPIType = () => {
             formsDestroy(formName);
           };
         }
-
         if (utils.isArray(fieldsName)) {
           fieldsName.forEach((fieldName) => {
             if (fieldName === formName) {
@@ -186,7 +206,7 @@ const createFormAPI: () => FormAPIType = () => {
                 currentFormListeners[KEY].add(nextListener);
               }
             } else {
-              let namePath = utils.getFieldNamePath(formName);
+              let namePath = utils.ArrayToJSONString(formName);
               if (namePath) {
                 if (!currentFormListeners[namePath]) {
                   currentFormListeners[namePath] = new Set();
@@ -203,7 +223,7 @@ const createFormAPI: () => FormAPIType = () => {
                 }
                 formsDestroy(formName);
               } else {
-                let namePath = utils.getFieldNamePath(formName);
+                let namePath = utils.ArrayToJSONString(formName);
                 if (
                   namePath &&
                   currentFormListeners &&
@@ -222,20 +242,24 @@ const createFormAPI: () => FormAPIType = () => {
         return unsubscribe;
       }, []);
     };
-    // 触发表单校验
+    /**
+     * 触发表单校验
+     * @param {FieldNamePath[] | undefined} paths 校验字段名称数组
+     * @returns {Promise<void>}
+     */
     const validate: ValidateInterface = (paths) => {
       let currentFormState = formsState.get(formName);
       let currentFormListeners4Validate = formsListeners4Validate.get(formName);
-
-      if (Array.isArray(paths)) {
+      if (utils.isArray(paths)) {
         let nextListener = paths
           .map((path) => {
-            return utils.getFieldNamePath(formName);
+            return utils.ArrayToJSONString(path);
           })
           .filter((path) => path && !!currentFormListeners4Validate[path])
           .map((path) => {
+            let fieldValue = get(utils.JSONStringToArray(path));
             return currentFormListeners4Validate[path as string](
-              get(convertName(path as string) as any),
+              fieldValue,
               currentFormState
             );
           });
@@ -251,7 +275,7 @@ const createFormAPI: () => FormAPIType = () => {
         });
       } else {
         let allListeners = Object.keys(currentFormListeners4Validate).map(
-          (path) => convertName(path) as NamePath
+          (path) => utils.JSONStringToArray(path)
         );
         return validate(allListeners);
       }
@@ -262,34 +286,35 @@ const createFormAPI: () => FormAPIType = () => {
      */
     const subscribeValidate: SubscribeValidateInterface = (options) => {
       const { paths, listener } = options;
-
       return useEffect(() => {
         let currentFormListeners4Validate =
           formsListeners4Validate.get(formName);
         let unsubscribe: () => void = () => {};
-
-        if (Array.isArray(paths)) {
+        if (utils.isArray(paths)) {
           paths.forEach((path) => {
-            let stringifyPath = convertName(path) as string;
-            currentFormListeners4Validate[stringifyPath] = listener;
+            let stringifyPath = utils.ArrayToJSONString(path);
+            if (!utils.isNone(stringifyPath)) {
+              currentFormListeners4Validate[stringifyPath] = listener;
+            }
           });
-
           unsubscribe = () => {
             if (currentFormListeners4Validate) {
               paths.forEach((path) => {
-                let stringifyPath = convertName(path) as string;
-                delete currentFormListeners4Validate[stringifyPath];
+                let stringifyPath = utils.ArrayToJSONString(path);
+                if (!utils.isNone(stringifyPath)) {
+                  delete currentFormListeners4Validate[stringifyPath];
+                }
               });
             }
           };
         }
-
         return unsubscribe;
       }, []);
     };
     /**
      * 触发订阅字段
-     *
+     * @returns {(isUpdate: boolean)=>void} formListenersTrigger
+     * @returns {(fieldValue: FieldValueType)=>void} fieldListenersTrigger
      */
     const listenerTrigger = () => {
       let currentFormState = formsState.get(formName);
@@ -310,7 +335,7 @@ const createFormAPI: () => FormAPIType = () => {
       };
       const fieldListenersTrigger = (fieldValue: FieldValueType) => {
         const { fieldName, value } = fieldValue as FieldValueType;
-        let currentFieldNamePath = utils.getFieldNamePath(fieldName);
+        let currentFieldNamePath = utils.ArrayToJSONString(fieldName);
         if (
           currentFieldNamePath &&
           currentFormListeners[currentFieldNamePath]
@@ -336,16 +361,9 @@ const createFormAPI: () => FormAPIType = () => {
       subscribe,
       subscribeValidate,
       validate,
-      item: {
-        getName,
-        convertName,
-      },
-      _private: {
-        context: FormContext,
-      },
+      getFieldName: getName,
     };
   };
-
   // 表单上下文hooks
   const useFormContext: useFormContextInterface = () => {
     const { formStore, dispatch } = useContext(FormContext);
@@ -363,7 +381,6 @@ const createFormAPI: () => FormAPIType = () => {
 
 export default createFormAPI;
 
-// 表单项工具方法
 /**
  * 获取表单项的设置路径标识
  * @param path 基于当前项的路径向前偏移的标识
@@ -379,48 +396,12 @@ export default createFormAPI;
  * // 获取当前项的父级路径
  * let currentItemName = getName(1);
  */
-const getName: GetNameInterface = (pathOffset = 0, type = "array") => {
+const getName: GetNameInterface = (pathOffset = 0) => {
   const itemContext = useContext(ItemContext);
-
-  let namePath: NamePathType = [];
+  let namePath: NamePathArray = [];
   if (itemContext && (itemContext as any).__parent) {
     namePath = [...(itemContext as any).__parent];
   }
-
   namePath = namePath.splice(0, namePath.length - pathOffset);
-
-  if (type === "string") {
-    return JSON.stringify(namePath);
-  } else {
-    return namePath;
-  }
-};
-
-/**
- * 表单项名称转换
- * @param {string | (string | number)[]} name 需要转换的路径
- *
- * @example
- * // 传入路径为素组
- * let name = convertName(["field1","field2"]) // '["field1","field2"]'
- * // 传入路径为字符串
- * let name = convertName('["field1","field2"]') // ["field1","field2"]
- */
-const convertName: ConvertNameInterface = (name) => {
-  if (typeof name === "string") {
-    try {
-      let arrayName = JSON.parse(name);
-      if (Array.isArray(arrayName)) {
-        return arrayName;
-      } else {
-        return [arrayName];
-      }
-    } catch {
-      return [name];
-    }
-  } else if (typeof name === "number") {
-    return [name];
-  } else {
-    return JSON.stringify(name);
-  }
+  return namePath;
 };

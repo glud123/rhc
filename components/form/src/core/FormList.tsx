@@ -1,9 +1,9 @@
 import React, { FC, useContext } from "react";
 import { FormContext, ItemContext } from "./context";
-import { NamePath, NamePathType } from "../types";
+import { FieldNamePath } from "../types";
 
 interface FormListPropsInterface {
-  name: NamePathType;
+  name: FieldNamePath;
 }
 
 const FormList: FC<FormListPropsInterface> = (props) => {
@@ -13,11 +13,9 @@ const FormList: FC<FormListPropsInterface> = (props) => {
 
   const { form } = formStore;
 
-  let currentName = (form.item.getName() as NamePath).concat(
-    form.item.convertName(name)
-  );
+  let currentName = form.getFieldName().concat(name);
 
-  form.subscribe({ paths: [currentName] });
+  form.subscribe({ fieldsName: currentName });
 
   const values = form.get(currentName);
 
@@ -49,11 +47,9 @@ const FormListItem: FC<FormListItemPropsInterface> = (props) => {
 
   const { form } = formStore;
 
-  let currentName = (form.item.getName() as NamePath).concat(
-    form.item.convertName(name)
-  );
+  let currentName = [...form.getFieldName(), name];
 
-  form.subscribe({ paths: [currentName] });
+  form.subscribe({ fieldsName: currentName });
 
   return (
     <ItemContext.Provider value={{ __parent: currentName }}>

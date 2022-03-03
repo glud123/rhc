@@ -1,4 +1,4 @@
-import type { FieldValueType, NamePath } from "./types";
+import type { FieldValueType, FieldNamePath } from "./types";
 
 /**
  * 判断是否是字符串
@@ -109,14 +109,14 @@ export const setValue = (allValue: any, fieldsValue: FieldValueType) => {
 /**
  * 按路径删除值
  * @param {any} allValue
- * @param {NamePath} fieldName
- * @returns {NamePath} parentFieldPath
+ * @param {FieldNamePath} fieldName
+ * @returns {FieldNamePath} 当前字段父级路径
  */
-export const removeValue = (allValue: any, fieldName: NamePath) => {
+export const removeValue = (allValue: any, fieldName: FieldNamePath) => {
   if (isNone(fieldName)) {
     return;
   }
-  let parentFieldPath: NamePath = [];
+  let parentFieldPath: FieldNamePath = [];
   if (isString(fieldName) || isNumber(fieldName)) {
     delete allValue[fieldName];
   }
@@ -135,19 +135,38 @@ export const removeValue = (allValue: any, fieldName: NamePath) => {
 };
 /**
  * 获取字段路径字符串
+ * @param {FieldNamePath} fieldName 字段路径数组
+ * @returns {string} 字段路径JSON字符串
  */
-export const getFieldNamePath: (fieldName: NamePath) => string | undefined = (
-  fieldName
+export const ArrayToJSONString: (arrayPath: FieldNamePath) => string = (
+  arrayPath
 ) => {
-  let path: string | undefined;
-
-  if (isString(fieldName) || isNumber(fieldName)) {
-    path = JSON.stringify([fieldName]);
+  let stringPath: string = "[]";
+  if (isString(arrayPath) || isNumber(arrayPath)) {
+    stringPath = JSON.stringify([arrayPath]);
   }
-
-  if (isArray(fieldName)) {
-    path = JSON.stringify(fieldName);
+  if (isArray(arrayPath)) {
+    stringPath = JSON.stringify(arrayPath);
   }
-
-  return path;
+  return stringPath;
+};
+/**
+ * 将JSON字符串字段路径转成数组
+ * @param {string | undefined} fieldName 字段路径JSON字符串
+ * @returns {(string | number)[]} 字段路径数组
+ */
+export const JSONStringToArray: (stringPath: string) => (string | number)[] = (
+  stringPath
+) => {
+  let arrayPath: (string | number)[] = [];
+  try {
+    if (isNone(stringPath)) {
+      arrayPath = [];
+    } else {
+      arrayPath = JSON.parse(stringPath);
+    }
+  } catch (error) {
+    arrayPath = [];
+  }
+  return arrayPath;
 };

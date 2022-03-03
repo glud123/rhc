@@ -33,7 +33,7 @@ export type FormInstanceType = {
   subscribe: SubscribeInterface;
   validate: ValidateInterface;
   subscribeValidate: SubscribeValidateInterface;
-  item: ItemType;
+  getFieldName: GetNameInterface;
 };
 
 export enum FormActionEnum {
@@ -108,32 +108,27 @@ export type ValueType = {
 export type ListenersType = {
   [k: string]: any;
 };
+// 字段名称路径
+export type NamePath = string | number;
 
-export type NamePath = string | number | (string | number)[];
+export type NamePathArray = NamePath[];
 
-export type NamesPath = NamePath[];
-
-export type NamePathType = number | string | NamePath;
+export type FieldNamePath = NamePath | NamePathArray;
 
 export type SubscribeOptionsType = {
-  fieldsName?: NamePath[];
+  fieldsName?: FieldNamePath[];
   listener?: (
     fieldValue: any,
     formValues: any,
     state?: "update" | "static"
   ) => void;
 };
-
-type ItemType = {
-  getName: GetNameInterface;
-  convertName: ConvertNameInterface;
-};
 export interface GetInterface {
-  (fieldsName?: NamePath[]): { [k: string]: any } | undefined;
+  (fieldsName?: FieldNamePath[]): { [k: string]: any } | undefined;
 }
 
 export type FieldValueType = {
-  fieldName: NamePath;
+  fieldName: FieldNamePath;
   value: any;
 };
 export interface SetInterface {
@@ -141,7 +136,7 @@ export interface SetInterface {
 }
 
 export interface RemoveInterface {
-  (fieldsName?: NamePath[]): void;
+  (fieldsName?: FieldNamePath[]): void;
 }
 
 export interface ResetInterface {
@@ -161,7 +156,7 @@ export interface UseFormInterface {
 }
 
 export type SubscribeValidateType = {
-  paths: NamesPath;
+  paths: FieldNamePath[];
   listener: (value: any, allValues: any) => Promise<any>;
 };
 
@@ -170,7 +165,7 @@ export interface SubscribeValidateInterface {
 }
 
 export interface ValidateInterface {
-  (paths?: NamesPath): Promise<any>;
+  (paths?: FieldNamePath[]): Promise<any>;
 }
 
 export type FormAPIType = {
@@ -179,9 +174,5 @@ export type FormAPIType = {
 };
 
 export interface GetNameInterface {
-  (pathOffset?: number, type?: "string" | "array"): string | NamePath;
-}
-
-export interface ConvertNameInterface {
-  (path: NamePathType): NamePathType;
+  (pathOffset?: number): NamePathArray;
 }

@@ -1,10 +1,10 @@
 import React, { FC, useCallback, useState } from "react";
-import type { FormInstanceType, NamePath, NamePathType } from "../../types";
+import type { FormInstanceType, NamePath } from "../../types";
 import "./index.css";
 
 interface WrapperValidationProps {
   form: FormInstanceType;
-  name: NamePathType;
+  name: NamePath;
   rules: (value: any, allValues: any) => Promise<any>;
   onChange?: any;
   [k: string]: any;
@@ -13,7 +13,7 @@ interface WrapperValidationProps {
 const WrapperValidation: FC<WrapperValidationProps> = (props) => {
   const { children, form, name, onChange, rules, ...rest } = props;
 
-  let namePath = form.item.getName() as NamePath;
+  let namePath = form.getFieldName();
 
   const [state, setState] = useState({
     isValid: true,

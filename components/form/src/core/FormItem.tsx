@@ -2,13 +2,13 @@ import React, { FC, useContext } from "react";
 import { FormContext, ItemContext } from "./context";
 import type {
   NamePath,
-  NamePathType,
+  FieldNamePath,
   WrapperItemType,
   WrapperValidationType,
 } from "../types";
 
 export interface FormItemPropsInterface {
-  name: NamePathType;
+  name: FieldNamePath;
   label?: string | React.ReactNode;
   required?: boolean;
   wrapperItem?: WrapperItemType;
@@ -37,13 +37,12 @@ const FormItem: FC<FormItemPropsInterface> = (props) => {
 
   const { form, wrapper, state } = formStore;
 
-  let currentName = [...(form.item.getName() as NamePath), name] as NamePath;
+  let currentName = form.getFieldName().concat(name);
 
-  form.subscribe({ paths: [currentName] });
+  form.subscribe({ fieldsName: currentName });
 
   const handleChange = (v: any) => {
-    let key = form.item.convertName(currentName) as string;
-    form.set({ [key]: v });
+    form.set({ fieldName: currentName, value: v });
   };
 
   let nextChildren = children;

@@ -1,9 +1,7 @@
 import React, { FC } from "react";
-import type { NamePathType } from "../../types";
 import "./index.css";
 
 interface WrapperItemInterface {
-  name: NamePathType;
   label?: string | React.ReactNode;
   required?: boolean;
 }
