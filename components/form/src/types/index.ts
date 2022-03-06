@@ -25,11 +25,11 @@ export type { WrapperValidationType } from "../wrapper/Validation";
  */
 export type FormInstanceType = {
   name: string;
-  set: SetInterface;
-  get: GetInterface;
-  remove: RemoveInterface;
-  reset: ResetInterface;
-  setInitialValue: SetInterface;
+  setValues: SetValuesInterface;
+  getValues: GetValuesInterface;
+  removeValues: RemoveValuesInterface;
+  resetValues: ResetValuesInterface;
+  setDefaultValue: SetValuesInterface;
   subscribe: SubscribeInterface;
   validate: ValidateInterface;
   subscribeValidate: SubscribeValidateInterface;
@@ -37,8 +37,8 @@ export type FormInstanceType = {
   subscribeState: SubscribeStateInterface;
   getStore: GetSoreInterface;
   setStore: SetSoreInterface;
-  subscribeSore: SubscribeSoreInterface;
-  getFieldName: GetNameInterface;
+  subscribeStore: SubscribeStoreInterface;
+  getFieldName: GetFieldNameInterface;
 };
 
 export enum FormActionEnum {
@@ -89,7 +89,7 @@ export type FormContextStoreType = {
 
 type FormReducerActionType = {
   type: FormActionEnum;
-  data?: FormInstanceType | WrapperType | StateType | StoreType;
+  data?: FormInstanceType | WrapperType;
 };
 
 export type FormContextType = {
@@ -126,7 +126,15 @@ export type SubscribeOptionsType = {
     state?: "update" | "static"
   ) => void;
 };
-export interface GetInterface {
+
+export interface CreateGetValuesInterface {
+  (
+    formName: string,
+    formsState: CreateFormStoreType["formsState"]
+  ): GetValuesInterface;
+}
+
+export interface GetValuesInterface {
   (fieldsName?: FieldNamePath[]): { [k: string]: any } | undefined;
 }
 
@@ -134,16 +142,41 @@ export type FieldValueType = {
   fieldName: FieldNamePath;
   value: any;
 };
-export interface SetInterface {
+
+export interface CreateSetValuesInterface {
+  (
+    formName: string,
+    formsState: CreateFormStoreType["formsState"],
+    formsListeners: CreateFormStoreType["formsListeners"]
+  ): SetValuesInterface;
+}
+
+export interface SetValuesInterface {
   (fieldsValue: FieldValueType | FieldValueType[]): void;
 }
 
-export interface RemoveInterface {
+export interface CreateRemoveValuesInterface {
+  (
+    formName: string,
+    formsState: CreateFormStoreType["formsState"],
+    formsListeners: CreateFormStoreType["formsListeners"]
+  ): RemoveValuesInterface;
+}
+
+export interface RemoveValuesInterface {
   (fieldsName?: FieldNamePath[]): void;
 }
 
-export interface ResetInterface {
+export interface ResetValuesInterface {
   (): void;
+}
+
+export interface CreateSubscribeInterface {
+  (
+    formName: string,
+    formsListeners: CreateFormStoreType["formsListeners"],
+    formsDestroy: CreateFormStoreType["formsDestroy"]
+  ): SubscribeInterface;
 }
 
 export interface SubscribeInterface {
@@ -159,8 +192,24 @@ export type SubscribeValidateType = {
   listener: (value: any, allValues: any) => Promise<any>;
 };
 
+export interface CreateSubscribeValidateInterface {
+  (
+    formName: string,
+    formsListeners4Validate: CreateFormStoreType["formsListeners4Validate"]
+  ): SubscribeValidateInterface;
+}
+
 export interface SubscribeValidateInterface {
   (options: SubscribeValidateType): void;
+}
+
+export interface CreateValidateInterface {
+  (
+    formName: string,
+    formsState: CreateFormStoreType["formsState"],
+    formsListeners4Validate: CreateFormStoreType["formsListeners4Validate"],
+    getValues: GetValuesInterface
+  ): ValidateInterface;
 }
 
 export interface ValidateInterface {
@@ -171,7 +220,7 @@ export type FormAPIType = {
   useForm: UseFormInterface;
 };
 
-export interface GetNameInterface {
+export interface GetFieldNameInterface {
   (pathOffset?: number): NamePathArray;
 }
 
@@ -179,8 +228,24 @@ export type FormStateType = {
   disabled: boolean;
 };
 
+export interface CreateSubscribeStateInterface {
+  (
+    formName: string,
+    formsState4Form: CreateFormStoreType["formsState4Form"],
+    formsListeners4FormState: CreateFormStoreType["formsListeners4FormState"]
+  ): SubscribeStateInterface;
+}
+
 export interface SubscribeStateInterface {
   (): FormStateType;
+}
+
+export interface CreateSetStateInterface {
+  (
+    formName: string,
+    formsState4Form: CreateFormStoreType["formsState4Form"],
+    formsListeners4FormState: CreateFormStoreType["formsListeners4FormState"]
+  ): SetStateInterface;
 }
 
 export interface SetStateInterface {
@@ -191,14 +256,75 @@ type StoreListenerType = {
   name: string;
   listener?: (value: any) => void;
 };
-export interface SubscribeSoreInterface {
+
+export interface CreateSubscribeStoreInterface {
+  (
+    formName: string,
+    formsStore: CreateFormStoreType["formsStore"],
+    formsListeners4Store: CreateFormStoreType["formsListeners4Store"]
+  ): SubscribeStoreInterface;
+}
+
+export interface SubscribeStoreInterface {
   (storeListener: StoreListenerType): StoreType;
+}
+
+export interface CreateSetSoreInterface {
+  (
+    formName: string,
+    formsStore: CreateFormStoreType["formsStore"],
+    formsListeners4Store: CreateFormStoreType["formsListeners4Store"]
+  ): SetSoreInterface;
 }
 
 export interface SetSoreInterface {
   (storeValue: StoreType): void;
 }
 
+export interface CreateGetSoreInterface {
+  (
+    formName: string,
+    formsStore: CreateFormStoreType["formsStore"]
+  ): GetSoreInterface;
+}
+
 export interface GetSoreInterface {
   (names?: string | string[]): StoreType;
+}
+
+type FormStoreGetType = (formName: string) => { [k: string]: any };
+
+type FormStoreSetType = (formName: string, nextState: any) => void;
+
+type CreateFormStoreType = {
+  [k in
+    | "formsState"
+    | "formsListeners"
+    | "formsListeners4Validate"
+    | "formsState4Form"
+    | "formsListeners4FormState"
+    | "formsStore"
+    | "formsListeners4Store"]: {
+    get: FormStoreGetType;
+    set: FormStoreSetType;
+  };
+} & {
+  formsDestroy: (formName: string) => void;
+};
+
+export interface CreateFormStoreInterface {
+  (): CreateFormStoreType;
+}
+
+type ListenerTriggerType = {
+  formListenersTrigger: (isUpdate: boolean) => void;
+  fieldListenersTrigger: (fieldValue: FieldValueType) => void;
+};
+
+export interface ListenerTriggerInterface {
+  (
+    formName: string,
+    formsState: CreateFormStoreType["formsState"],
+    formsListeners: CreateFormStoreType["formsListeners"]
+  ): ListenerTriggerType;
 }

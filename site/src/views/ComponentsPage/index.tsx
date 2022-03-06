@@ -12,7 +12,7 @@ const Page = () => {
   const handleClick = () => {
     form.validate().then((data) => {
       console.log(data);
-      let value = form.get();
+      let value = form.getValues();
       setFormData({ ...value });
     });
   };

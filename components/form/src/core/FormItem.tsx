@@ -43,7 +43,7 @@ const FormItem: FC<FormItemPropsInterface> = (props) => {
   let formState = form.subscribeState();
 
   const handleChange = (v: any) => {
-    form.set({ fieldName: currentName, value: v });
+    form.setValues({ fieldName: currentName, value: v });
   };
 
   let nextChildren = children;
@@ -59,7 +59,7 @@ const FormItem: FC<FormItemPropsInterface> = (props) => {
           name: name,
           disabled: formState.disabled,
           rules: rules,
-          value: form.get(currentName),
+          value: form.getValues(currentName),
           onChange: handleChange,
         },
         children
@@ -67,7 +67,7 @@ const FormItem: FC<FormItemPropsInterface> = (props) => {
     } else {
       nextChildren = React.cloneElement(children as React.ReactElement, {
         disabled: formState.disabled,
-        value: form.get(currentName),
+        value: form.getValues(currentName),
         onChange: handleChange,
       });
     }

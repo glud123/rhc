@@ -15,7 +15,7 @@ const Example = () => {
     form.validate().then((err) => {
       if (err) {
       } else {
-        let formValue = form.get();
+        let formValue = form.getValues();
         console.log(formValue);
       }
     });

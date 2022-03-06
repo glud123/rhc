@@ -17,7 +17,7 @@ const FormList: FC<FormListPropsInterface> = (props) => {
 
   form.subscribe({ fieldsName: currentName });
 
-  const values = form.get(currentName);
+  const values = form.getValues(currentName);
 
   return (
     <ItemContext.Provider value={{ __parent: currentName }}>

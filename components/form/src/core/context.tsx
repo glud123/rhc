@@ -5,6 +5,7 @@ import type {
   FormInstanceType,
   FormReducerInterface,
   WrapperType,
+  CreateFormStoreInterface,
 } from "../types";
 
 /**
@@ -28,15 +29,12 @@ export const formReducer: FormReducerInterface = (state, action) => {
   switch (type) {
     case FormActionEnum.Form:
       return { ...state, form: data as FormInstanceType };
-    // case FormActionEnum.State:
-    //   return { ...state, state: { ...state["state"], ...data } };
     case FormActionEnum.Update:
       return { ...state };
     case FormActionEnum.Wrapper:
       return { ...state, wrapper: data as WrapperType };
     default:
       return { ...state };
-    // return { ...state, store: { ...state["store"], ...data } };
   }
 };
 
@@ -56,40 +54,6 @@ type __FORM_STORE__type = {
   // 表单提供的数据仓库监听器集合
   _listeners4Store: { [k: string]: any };
 };
-
-interface createFormStoreInterface {
-  (): {
-    formsState: {
-      get: (formName: string) => { [k: string]: any };
-      set: (formName: string, nextState: any) => void;
-    };
-    formsListeners: {
-      get: (formName: string) => { [k: string]: any };
-      set: (formName: string, nextListeners: any) => void;
-    };
-    formsListeners4Validate: {
-      get: (formName: string) => { [k: string]: any };
-      set: (formName: string, nextListeners4Validate: any) => void;
-    };
-    formsState4Form: {
-      get: (formName: string) => { [k: string]: any };
-      set: (formName: string, nextState: any) => void;
-    };
-    formsListeners4FormState: {
-      get: (formName: string) => { [k: string]: any };
-      set: (formName: string, nextState: any) => void;
-    };
-    formsStore: {
-      get: (formName: string) => { [k: string]: any };
-      set: (formName: string, nextState: any) => void;
-    };
-    formsListeners4Store: {
-      get: (formName: string) => { [k: string]: any };
-      set: (formName: string, nextState: any) => void;
-    };
-    formsDestroy: (formName: string) => void;
-  };
-}
 
 /**
  * 表单数据仓库
@@ -142,7 +106,7 @@ let __FORM_STORE__: __FORM_STORE__type = {
  * // form1 的 listeners ==> {}
  *
  */
-export const createFormStore: createFormStoreInterface = () => {
+export const createFormStore: CreateFormStoreInterface = () => {
   const get = (key: keyof __FORM_STORE__type, formName: string) => {
     const preState = __FORM_STORE__[key][formName];
     if (typeof preState === "undefined") {

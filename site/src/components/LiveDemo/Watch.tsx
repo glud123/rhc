@@ -9,7 +9,7 @@ const Watch = () => {
 
   form.subscribe();
 
-  let formValue = form.get();
+  let formValue = form.getValues();
 
   return (
     <div className={styles.watch}>
