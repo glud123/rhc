@@ -12,13 +12,22 @@ const Example = () => {
   const styles = useStyles();
 
   const handleSubmit = () => {
-    form.validate().then((err) => {
-      if (err) {
-      } else {
+    form
+      .validate()
+      .then((value) => {
+        console.log("then", value);
+
         let formValue = form.getValues();
-        console.log(formValue);
-      }
-    });
+        console.log("formValue", formValue);
+        form.setStore({
+          values: formValue,
+        });
+      })
+      .catch((err) => {
+        form.setStore({
+          formErr: err,
+        });
+      });
   };
 
   const handleEdit = (edit: boolean) => {

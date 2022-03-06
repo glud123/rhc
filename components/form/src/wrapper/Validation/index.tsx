@@ -20,8 +20,9 @@ const WrapperValidation: FC<WrapperValidationProps> = (props) => {
     message: "",
   });
 
-  const listener = useCallback(
-    (value: any, allValues: any) => {
+  form.subscribeValidate({
+    paths: [namePath],
+    listener: (value: any, allValues: any) => {
       return rules(value, allValues)
         .then(() => {
           setState({
@@ -35,15 +36,9 @@ const WrapperValidation: FC<WrapperValidationProps> = (props) => {
             isValid: false,
             message: e.message,
           });
-          return Promise.reject({ field: name, message: e.message });
+          return Promise.reject({ field: namePath, message: e.message });
         });
     },
-    [rules]
-  );
-
-  form.subscribeValidate({
-    paths: [namePath],
-    listener: listener,
   });
 
   const handleChange = (v: any) => {

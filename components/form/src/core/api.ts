@@ -348,8 +348,13 @@ const createValidate: CreateValidateInterface = (
         .filter((path) => path && !!currentFormListeners4Validate[path])
         .map((path) => {
           let fieldValue = getValues(utils.JSONStringToArray(path));
-          return triggerListener(path, fieldValue, currentFormState);
-        });
+          return triggerListener(
+            path,
+            fieldValue,
+            currentFormState
+          ) as unknown as Promise<any>[];
+        })
+        .reduce((prev, cur) => prev.concat(cur), []);
       return Promise.allSettled(nextListener).then((results) => {
         let rejecteds = results
           .filter((result) => result.status === "rejected")
@@ -357,7 +362,8 @@ const createValidate: CreateValidateInterface = (
         if (rejecteds.length > 0) {
           return Promise.reject(rejecteds);
         } else {
-          return Promise.resolve();
+          let fieldsValue = getValues(paths);
+          return Promise.resolve(fieldsValue);
         }
       });
     } else {

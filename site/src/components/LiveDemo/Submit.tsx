@@ -7,10 +7,14 @@ const Submit = () => {
   const styles = useStyles();
   const form = useForm("live-demo");
 
+  form.subscribeStore({ name: "values" });
+
+  let values = form.getStore("values");
+
   return (
     <div className={styles.submit}>
       <Info>点击【提交】按钮后的数据将在这里显示</Info>
-      <pre className={styles.pre}>{JSON.stringify({}, null, 2)}</pre>
+      <pre className={styles.pre}>{JSON.stringify(values, null, 2)}</pre>
     </div>
   );
 };
