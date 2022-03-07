@@ -40,11 +40,12 @@ export const isObject = (args: any): args is { [k: string]: any } =>
  */
 export const getValue = (paths: any, value: any = {}) => {
   let resolve = {};
+  let copyValue = JSON.parse(JSON.stringify(value));
   if (isNone(paths)) {
-    resolve = value;
+    resolve = copyValue;
   }
   if (isString(paths) || isNumber(paths)) {
-    resolve = value[paths];
+    resolve = copyValue[paths];
   }
   if (isArray(paths)) {
     let lastIndex = paths.length - 1;
@@ -75,7 +76,7 @@ export const getValue = (paths: any, value: any = {}) => {
         };
       },
       {
-        nextValue: value,
+        nextValue: copyValue,
         resolve: resolve,
       }
     );
