@@ -10,6 +10,7 @@ export interface FormItemPropsInterface {
   name: FieldNamePath;
   label?: string | React.ReactNode;
   required?: boolean;
+  dependencies?: FieldNamePath[];
   wrapperItem?: WrapperItemType;
   wrapperValidation?: WrapperValidationType;
   rules?: (value: any, allValues: any) => Promise<any>;
@@ -21,6 +22,7 @@ const FormItem: FC<FormItemPropsInterface> = (props) => {
     name,
     label,
     required,
+    dependencies = [],
     children,
     wrapperItem,
     wrapperValidation,
@@ -38,9 +40,11 @@ const FormItem: FC<FormItemPropsInterface> = (props) => {
 
   let currentName = form.getFieldName().concat(name);
 
-  form.subscribe({ fieldsName: currentName });
+  form.subscribe({ fieldsName: [currentName, ...dependencies] });
 
   let formState = form.subscribeState();
+
+  let currentValue = form.getValues(currentName);
 
   const handleChange = (v: any) => {
     form.setValues({ fieldName: currentName, value: v });
@@ -59,7 +63,7 @@ const FormItem: FC<FormItemPropsInterface> = (props) => {
           name: name,
           disabled: formState.disabled,
           rules: rules,
-          value: form.getValues(currentName),
+          value: currentValue,
           onChange: handleChange,
         },
         children
@@ -67,7 +71,7 @@ const FormItem: FC<FormItemPropsInterface> = (props) => {
     } else {
       nextChildren = React.cloneElement(children as React.ReactElement, {
         disabled: formState.disabled,
-        value: form.getValues(currentName),
+        value: currentValue,
         onChange: handleChange,
       });
     }

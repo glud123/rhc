@@ -15,7 +15,7 @@ const FormList: FC<FormListPropsInterface> = (props) => {
 
   let currentName = form.getFieldName().concat(name);
 
-  form.subscribe({ fieldsName: currentName });
+  form.subscribe({ fieldsName: [currentName] });
 
   const values = form.getValues(currentName);
 
@@ -47,7 +47,9 @@ const FormListItem: FC<FormListItemPropsInterface> = (props) => {
 
   const { form } = formStore;
 
-  let currentName = [...form.getFieldName(), name];
+  let parentName = form.getFieldName();
+
+  let currentName = [...parentName, name];
 
   form.subscribe({ fieldsName: currentName });
 
