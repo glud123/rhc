@@ -24,6 +24,7 @@ import {
   CreateSetSoreInterface,
   CreateGetSoreInterface,
   ListenerTriggerInterface,
+  NamePath,
 } from "../types";
 
 const createFormAPI: () => FormAPIType = () => {
@@ -151,18 +152,34 @@ const createGetValues: CreateGetValuesInterface = (formName, formsState) => {
   return (fieldsName) => {
     let currentFormState = formsState.get(formName);
     if (utils.isNone(fieldsName)) {
-      return currentFormState;
+      return utils.getValue(fieldsName, currentFormState);
     }
     if (utils.isArray(fieldsName)) {
-      if (fieldsName.length === 0) {
-        return currentFormState;
-      }
-      if (fieldsName.length === 1) {
+      if (fieldsName.length <= 1) {
         return utils.getValue(fieldsName[0], currentFormState);
       } else {
-        return fieldsName.map((fieldKey) => {
-          return utils.getValue(fieldKey, currentFormState);
+        // 获取多个单层字段的值 返回 { 字段名: 字段值 }
+        let isSingleFieldName = fieldsName.every((item) => {
+          return utils.isString(item) || utils.isNumber(item);
         });
+        if (isSingleFieldName) {
+          let result: { [k: string]: any } = {};
+          fieldsName.forEach((fieldKey) => {
+            result[fieldKey as unknown as NamePath] = utils.getValue(
+              fieldKey,
+              currentFormState
+            );
+          });
+          return result;
+        } else {
+          // 获取多个多层字段的值 返回 [{ fieldName: 字段路径, value: 字段值 }, ...]
+          return fieldsName.map((fieldKey) => {
+            return {
+              fieldName: fieldKey,
+              value: utils.getValue(fieldKey, currentFormState),
+            };
+          });
+        }
       }
     } else {
       throw new Error("fieldName must be array or undefined!");
@@ -533,22 +550,18 @@ const createSubscribeState: CreateSubscribeStateInterface = (
 const createGetStore: CreateGetSoreInterface = (formName, formsStore) => {
   return (names) => {
     let currentFormStore = formsStore.get(formName);
-    if (utils.isNone(names)) {
-      return currentFormStore;
-    }
-    if (utils.isString(names)) {
+    if (utils.isNone(names) || utils.isString(names)) {
       return utils.getValue(names, currentFormStore);
     }
     if (utils.isArray(names)) {
-      if (names.length === 0) {
-        return currentFormStore;
-      }
-      if (names.length === 1) {
+      if (names.length <= 1) {
         return utils.getValue(names[0], currentFormStore);
       } else {
-        return names.map((fieldKey) => {
-          return utils.getValue(fieldKey, currentFormStore);
+        let result: { [k: string]: any } = {};
+        names.forEach((fieldKey) => {
+          result[fieldKey] = utils.getValue(fieldKey, currentFormStore);
         });
+        return result;
       }
     } else {
       throw new Error("fieldName must be array or undefined!");

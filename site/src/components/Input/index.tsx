@@ -12,9 +12,6 @@ interface InputProps {
 const Input: FC<InputProps> = (props) => {
   const { value = "", onChange, type = "text", placeholder, disabled } = props;
 
-  console.log(disabled);
-  
-
   const styles = useStyles();
 
   const handleChange = (e: { target: { value: string } }) => {

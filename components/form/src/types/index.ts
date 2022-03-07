@@ -134,8 +134,16 @@ export interface CreateGetValuesInterface {
   ): GetValuesInterface;
 }
 
-export interface GetValuesInterface {
-  (fieldsName?: FieldNamePath[]): { [k: string]: any } | undefined;
+export interface GetValuesInterface<
+  T = FieldNamePath[] | NamePathArray | NamePath
+> {
+  (fieldsName?: T): T extends FieldNamePath[]
+    ? FieldValueType[]
+    : T extends NamePathArray
+    ? { [k: string]: any }
+    : T extends NamePath
+    ? any
+    : { [k: string]: any };
 }
 
 export type FieldValueType = {

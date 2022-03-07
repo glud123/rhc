@@ -3,6 +3,7 @@ import Form, { useForm } from "@rhc/form";
 import Input from "@/components/Input";
 import Select from "@/components/Select";
 import Button from "@/components/Button";
+import Demo from "./Demo";
 
 const Page = () => {
   const form = useForm("demo");
@@ -82,6 +83,9 @@ const Page = () => {
               { label: "三班", value: "class3" },
             ]}
           />
+        </Form.Item>
+        <Form.Item name="demo" dependencies={["name", "age", "address"]}>
+          <Demo />
         </Form.Item>
       </Form>
       <Button type="secondary" onClick={handleClick}>
