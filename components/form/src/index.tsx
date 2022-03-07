@@ -6,6 +6,8 @@ import type {
   FormItemType,
 } from "./types";
 
+export * from "./types";
+
 const formAPI: FormAPIType = createFormAPI();
 
 interface FormInterface extends FormCoreType {
