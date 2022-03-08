@@ -1,7 +1,8 @@
 import React from "react";
 import { useRoutes } from "react-router-dom";
-import Home from "./views/Home";
-import ComponentsPage from "./views/ComponentsPage";
+import Home from "@/views/Home";
+import ComponentsPage from "@/views/ComponentsPage";
+import APIPage from "@/views/APIPage";
 
 const Routes = () => {
   return useRoutes(routes);
@@ -15,6 +16,11 @@ export const routes = [
     name: "Home",
     hidden: true,
     element: <Home />,
+  },
+  {
+    path: "/api",
+    name: "API",
+    element: <APIPage />,
   },
   {
     path: "/components",
