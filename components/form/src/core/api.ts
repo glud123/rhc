@@ -293,7 +293,7 @@ const createSubscribe: CreateSubscribeInterface = (
   formsListeners,
   formsDestroy
 ) => {
-  return (options = {}) => {
+  return (options = {}, deps = []) => {
     const [, forceUpdate] = useReducer((c) => c + 1, 0) as [never, () => void];
     const { fieldsName, listener } = options;
     let nextListener = listener ? listener : forceUpdate;
@@ -336,7 +336,7 @@ const createSubscribe: CreateSubscribeInterface = (
         };
       }
       return unsubscribe;
-    }, []);
+    }, deps);
   };
 };
 
@@ -401,7 +401,7 @@ const createSubscribeValidate: CreateSubscribeValidateInterface = (
   formName,
   formsListeners4Validate
 ) => {
-  return (options) => {
+  return (options, deps = []) => {
     const { paths, listener } = options;
     useEffect(() => {
       let currentFormListeners4Validate = formsListeners4Validate.get(formName);
@@ -424,7 +424,7 @@ const createSubscribeValidate: CreateSubscribeValidateInterface = (
         };
       }
       return unsubscribe;
-    }, []);
+    }, deps);
   };
 };
 
@@ -525,7 +525,7 @@ const createSubscribeState: CreateSubscribeStateInterface = (
   formsState4Form,
   formsListeners4FormState
 ) => {
-  return () => {
+  return (deps = []) => {
     const [, forceUpdate] = useReducer((c) => c + 1, 0) as [never, () => void];
     useEffect(() => {
       let currentFormsListeners4FormState =
@@ -539,7 +539,7 @@ const createSubscribeState: CreateSubscribeStateInterface = (
         removeListener(formName, forceUpdate);
       };
       return unsubscribe;
-    }, []);
+    }, deps);
     return formsState4Form.get(formName) as FormStateType;
   };
 };
@@ -603,7 +603,7 @@ const createSubscribeStore: CreateSubscribeStoreInterface = (
   formsStore,
   formsListeners4Store
 ) => {
-  return (storeListener) => {
+  return (storeListener, deps) => {
     const { name, listener } = storeListener;
     const [, forceUpdate] = useReducer((c) => c + 1, 0) as [never, () => void];
     let currentListener = listener ? listener : forceUpdate;
@@ -617,7 +617,7 @@ const createSubscribeStore: CreateSubscribeStoreInterface = (
         removeListener(name, currentListener);
       };
       return unsubscribe;
-    }, []);
+    }, deps);
     return formsStore.get(name);
   };
 };

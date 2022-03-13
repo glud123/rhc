@@ -188,7 +188,7 @@ export interface CreateSubscribeInterface {
 }
 
 export interface SubscribeInterface {
-  (options?: SubscribeOptionsType): void;
+  (options?: SubscribeOptionsType, deps?: any[]): void;
 }
 
 export interface UseFormInterface {
@@ -208,7 +208,7 @@ export interface CreateSubscribeValidateInterface {
 }
 
 export interface SubscribeValidateInterface {
-  (options: SubscribeValidateType): void;
+  (options: SubscribeValidateType, deps?: any[]): void;
 }
 
 export interface CreateValidateInterface {
@@ -245,7 +245,7 @@ export interface CreateSubscribeStateInterface {
 }
 
 export interface SubscribeStateInterface {
-  (): FormStateType;
+  (deps?: any[]): FormStateType;
 }
 
 export interface CreateSetStateInterface {
@@ -274,7 +274,7 @@ export interface CreateSubscribeStoreInterface {
 }
 
 export interface SubscribeStoreInterface {
-  (storeListener: StoreListenerType): StoreType;
+  (storeListener: StoreListenerType, deps?: any[]): StoreType;
 }
 
 export interface CreateSetSoreInterface {
