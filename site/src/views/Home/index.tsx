@@ -1,5 +1,5 @@
 import React from "react";
-import LiveDemo from "@/components/LiveDemo";
+import LiveDemo from "./LiveDemo";
 
 const Home = () => {
   return (
