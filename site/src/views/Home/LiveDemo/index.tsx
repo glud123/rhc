@@ -1,49 +1,28 @@
 import React from "react";
-import { createUseStyles } from "react-jss";
 import Card from "@/components/Card";
+import Group from "@/components/Group";
 import Example from "./Example";
 import Watch from "./Watch";
 import Errors from "./Errors";
 import Submit from "./Submit";
 
 const LiveDemo = () => {
-  const styles = useStyles();
   return (
-    <ul className={styles.live_demo}>
-      <li>
-        <Card title="Example">
-          <Example />
-        </Card>
-      </li>
-      <li>
-        <Card title="Watch">
-          <Watch />
-        </Card>
-      </li>
-      <li>
-        <Card title="Errors">
-          <Errors />
-        </Card>
-      </li>
-      <li>
-        <Card title="Submit">
-          <Submit />
-        </Card>
-      </li>
-    </ul>
+    <Group>
+      <Card title="Example">
+        <Example />
+      </Card>
+      <Card title="Watch">
+        <Watch />
+      </Card>
+      <Card title="Errors">
+        <Errors />
+      </Card>
+      <Card title="Submit">
+        <Submit />
+      </Card>
+    </Group>
   );
 };
 
 export default LiveDemo;
-
-const useStyles = createUseStyles({
-  live_demo: {
-    display: "flex",
-    gap: "32px",
-    padding: "0px",
-    "& li": {
-      flex: 1,
-      listStyle: "none",
-    },
-  },
-});

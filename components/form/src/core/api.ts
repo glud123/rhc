@@ -6,6 +6,7 @@ import {
   ValueType,
   CreateGetValuesInterface,
   CreateSetValuesInterface,
+  SetDefaultValueInterface,
   SetValuesInterface,
   CreateRemoveValuesInterface,
   ResetValuesInterface,
@@ -53,7 +54,7 @@ const createFormAPI: () => FormAPIType = () => {
     /**
      * 设置表单初始值数据
      */
-    const setDefaultValue: SetValuesInterface = (defaultValue) => {
+    const setDefaultValue: SetDefaultValueInterface = (defaultValue) => {
       formDefaultValue[formName] = JSON.stringify(defaultValue);
     };
     /**

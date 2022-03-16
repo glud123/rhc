@@ -29,7 +29,7 @@ export type FormInstanceType = {
   getValues: GetValuesInterface;
   removeValues: RemoveValuesInterface;
   resetValues: ResetValuesInterface;
-  setDefaultValue: SetValuesInterface;
+  setDefaultValue: SetDefaultValueInterface;
   subscribe: SubscribeInterface;
   validate: ValidateInterface;
   subscribeValidate: SubscribeValidateInterface;
@@ -161,6 +161,10 @@ export interface CreateSetValuesInterface {
 
 export interface SetValuesInterface {
   (fieldsValue: FieldValueType | FieldValueType[]): void;
+}
+
+export interface SetDefaultValueInterface {
+  (fieldsValue: any): void;
 }
 
 export interface CreateRemoveValuesInterface {
