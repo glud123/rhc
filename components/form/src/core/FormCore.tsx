@@ -42,9 +42,13 @@ const FormCore: FC<FormCorePropsInterface> = (props) => {
     }
   }, []);
 
-  form.subscribe({
-    listener,
-  });
+  form.subscribe(
+    {
+      listener,
+    },
+    [],
+    true
+  );
 
   useEffect(() => {
     dispatch({

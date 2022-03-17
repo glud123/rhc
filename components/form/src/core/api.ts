@@ -220,25 +220,31 @@ const createSetValues: CreateSetValuesInterface = (
         utils.setValue(currentFormState, fieldsValue as FieldValueType);
         // 触发订阅了当前字段的监听器，并更新当前字段的状态
         fieldListenersTrigger(fieldsValue as FieldValueType);
+        // 如果订阅了表单变化，通知其更新
+        formListenersTrigger(false);
       }
     }
     // 多个字段设值
     if (utils.isArray(fieldsValue)) {
+      let flag = true;
       fieldsValue.forEach((fieldValue) => {
         const { fieldName, value } = fieldValue as FieldValueType;
         if (fieldName === formName) {
           formsState.set(formName, value);
           // 触发表单监听器，并更新当前表单的状态
           formListenersTrigger(true);
+          flag = false;
         } else {
           utils.setValue(currentFormState, fieldValue as FieldValueType);
           // 触发订阅了当前字段的监听器，并更新当前字段的状态
           fieldListenersTrigger(fieldValue as FieldValueType);
         }
       });
+      if (flag) {
+        // 如果订阅了表单变化，通知其更新
+        formListenersTrigger(false);
+      }
     }
-    // 如果订阅了表单变化，通知其更新
-    formListenersTrigger(false);
   };
 };
 
@@ -294,19 +300,25 @@ const createSubscribe: CreateSubscribeInterface = (
   formsListeners,
   formsDestroy
 ) => {
-  return (options = {}, deps = []) => {
+  return (options = {}, deps = [], isFromForm = false) => {
     const [, forceUpdate] = useReducer((c) => c + 1, 0) as [never, () => void];
     const { fieldsName, listener } = options;
     let nextListener = listener ? listener : forceUpdate;
+    // 区分 subscribe 来源，是否来自表单的监听，默认为 false
+    const listenerObj = {
+      isFromForm,
+      listener: nextListener,
+    };
+
     useEffect(() => {
       let currentFormListeners = formsListeners.get(formName);
       const { addListener, removeListener } =
         utils.listenerOperation(currentFormListeners);
       let unsubscribe: () => void = () => {};
       if (utils.isNone(fieldsName)) {
-        addListener(formName, nextListener);
+        addListener(formName, listenerObj);
         unsubscribe = () => {
-          const currentListenerNumber = removeListener(formName, nextListener);
+          const currentListenerNumber = removeListener(formName, listenerObj);
           if (currentListenerNumber === 0) {
             formsDestroy(formName);
           }
@@ -318,7 +330,7 @@ const createSubscribe: CreateSubscribeInterface = (
             fieldName === formName
               ? formName
               : utils.ArrayToJSONString(fieldName);
-          addListener(listenerName, nextListener);
+          addListener(listenerName, listenerObj);
         });
         unsubscribe = () => {
           fieldsName.forEach((fieldName) => {
@@ -328,7 +340,7 @@ const createSubscribe: CreateSubscribeInterface = (
                 : utils.ArrayToJSONString(fieldName);
             const currentListenerNumber = removeListener(
               listenerName,
-              nextListener
+              listenerObj
             );
             if (currentListenerNumber === 0) {
               formsDestroy(listenerName);
@@ -439,17 +451,44 @@ const listenerTrigger: ListenerTriggerInterface = (
   formsState,
   formsListeners
 ) => {
+  const getValues = createGetValues(formName, formsState);
   let currentFormState = formsState.get(formName);
   let currentFormListeners = formsListeners.get(formName);
-  const { triggerListener } = utils.listenerOperation(currentFormListeners);
+  let allListeners: { [k: string]: any } = {}; // 存储所有监听器
+  let notFromFormListeners: { [k: string]: any } = {}; // 存储非表单内部监听器
+  Object.keys(currentFormListeners).forEach((listenerName) => {
+    allListeners[listenerName] = [...currentFormListeners[listenerName]].map(
+      (item) => {
+        return item.listener;
+      }
+    );
+    notFromFormListeners[listenerName] = [...currentFormListeners[listenerName]]
+      .filter((item) => {
+        return !item.isFromForm;
+      })
+      .map((item) => {
+        return item.listener;
+      });
+  });
+  const { triggerListener } = utils.listenerOperation(allListeners);
   const formListenersTrigger = (isUpdate: boolean) => {
-    // 如果订阅了表单变化，通知其更新
+    // 表单级数据变化，不仅要更新订阅表单的状态变化的 listener，还要更新除表单内表单项以外订阅了当前表单字段的状态变化的 listener
+    // 触发当前表单的状态变化的 listener
     triggerListener(
       formName,
       currentFormState,
       currentFormState,
       isUpdate ? "update" : "static"
     );
+    if (isUpdate) {
+      // 当表单整体更新时，触发当前表单项以外的字段 listener
+      const { triggerListener: triggerNotFromFormListener } =
+        utils.listenerOperation(notFromFormListeners);
+      Object.keys(notFromFormListeners).forEach((fieldName) => {
+        let fieldValue = getValues(utils.JSONStringToArray(fieldName));
+        triggerNotFromFormListener(fieldName, fieldValue, currentFormState);
+      });
+    }
   };
   const fieldListenersTrigger = (fieldValue: FieldValueType) => {
     const { fieldName, value } = fieldValue as FieldValueType;

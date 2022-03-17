@@ -45,18 +45,9 @@ interface ItemProps {
 const Item: FC<ItemProps> = (props) => {
   const { isSubscribe } = props;
   const form = useForm("subscriptions_outside");
-
-  let fieldName = ["watching"];
-
-  let fieldValue = "";
-
-  if (!isSubscribe) {
-    fieldName = [];
-  } else {
-    fieldValue = form.getValues(fieldName);
-  }
-
-  form.subscribe({ fieldsName: fieldName }, [isSubscribe]);
+  const fieldName = ["watching"];
+  const fieldValue = isSubscribe ? form.getValues(fieldName) : "";
+  form.subscribe({ fieldsName: isSubscribe ? fieldName : [] }, [isSubscribe]);
 
   return <span>{fieldValue}</span>;
 };

@@ -192,7 +192,7 @@ export interface CreateSubscribeInterface {
 }
 
 export interface SubscribeInterface {
-  (options?: SubscribeOptionsType, deps?: any[]): void;
+  (options?: SubscribeOptionsType, deps?: any[], fromFormItem?: boolean): void;
 }
 
 export interface UseFormInterface {

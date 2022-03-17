@@ -167,38 +167,57 @@ export const JSONStringToArray: (stringPath: string) => (string | number)[] = (
       arrayPath = JSON.parse(stringPath);
     }
   } catch (error) {
-    arrayPath = [];
+    arrayPath = [stringPath];
   }
   return arrayPath;
 };
 
+type ListenerCallback = (...args: any[]) => void;
+// 针对表单中的 listener 区分其来源，以达到更精准的监听触发
+type ListenerObjectType = {
+  isFromForm: boolean; // 是否来自表单的监听 默认为 false
+  listener: ListenerCallback;
+};
+
 type ListenerOperationType = {
-  addListener: (key: string, callback: (...args: any[]) => void) => void;
-  removeListener: (key: string, callback: (...args: any[]) => void) => number;
+  addListener: (
+    key: string,
+    listener: ListenerObjectType | ListenerCallback
+  ) => void;
+  removeListener: (
+    key: string,
+    listener: ListenerObjectType | ListenerCallback
+  ) => number;
   triggerListener: (key: string, ...args: any[]) => void;
 };
 /**
  * 创建监听器操作方法
  * @param {any} listener
  */
-export const listenerOperation: (listener: any) => ListenerOperationType = (
-  listener
+export const listenerOperation: (listeners: any) => ListenerOperationType = (
+  listeners
 ) => {
-  const addListener = (key: string, callback: (...args: any[]) => void) => {
-    if (isNone(listener[key])) {
-      listener[key] = new Set();
+  const addListener = (
+    key: string,
+    listener: ListenerObjectType | ListenerCallback
+  ) => {
+    if (isNone(listeners[key])) {
+      listeners[key] = new Set();
     }
-    listener[key].add(callback);
+    listeners[key].add(listener);
   };
-  const removeListener = (key: string, callback: (...args: any[]) => void) => {
-    if (listener[key] && listener[key].has(callback)) {
-      listener[key].delete(callback);
+  const removeListener = (
+    key: string,
+    listener: ListenerObjectType | ListenerCallback
+  ) => {
+    if (listeners[key] && listeners[key].has(listener)) {
+      listeners[key].delete(listener);
     }
-    return listener[key].size;
+    return listeners[key].size;
   };
   const triggerListener = (key: string, ...args: any[]) => {
-    if (!isNone(listener[key])) {
-      return [...listener[key]].map(
+    if (!isNone(listeners[key])) {
+      return [...listeners[key]].map(
         (listenerItem: (...args: any[]) => any) =>
           listenerItem && listenerItem(...args)
       );
