@@ -7,7 +7,6 @@ import {
   CreateGetValuesInterface,
   CreateSetValuesInterface,
   SetDefaultValueInterface,
-  SetValuesInterface,
   CreateRemoveValuesInterface,
   ResetValuesInterface,
   CreateSubscribeInterface,
@@ -300,13 +299,13 @@ const createSubscribe: CreateSubscribeInterface = (
   formsListeners,
   formsDestroy
 ) => {
-  return (options = {}, deps = [], isFromForm = false) => {
+  return (options = {}, deps = [], from = "other") => {
     const [, forceUpdate] = useReducer((c) => c + 1, 0) as [never, () => void];
     const { fieldsName, listener } = options;
     let nextListener = listener ? listener : forceUpdate;
     // 区分 subscribe 来源，是否来自表单的监听，默认为 false
     const listenerObj = {
-      isFromForm,
+      from: from,
       listener: nextListener,
     };
 
@@ -377,11 +376,14 @@ const createValidate: CreateValidateInterface = (
         })
         .filter((path) => path && !!currentFormListeners4Validate[path])
         .map((path) => {
-          let fieldValue = getValues(utils.JSONStringToArray(path));
+          let pathArray = utils.JSONStringToArray(path);
+          let fieldValue = getValues(pathArray);
+          let formValues = utils.getValue(undefined, currentFormState);
           return triggerListener(
             path,
             fieldValue,
-            currentFormState
+            pathArray,
+            formValues
           ) as unknown as Promise<any>[];
         })
         .reduce((prev, cur) => prev.concat(cur), []);
@@ -452,8 +454,8 @@ const listenerTrigger: ListenerTriggerInterface = (
   formsListeners
 ) => {
   const getValues = createGetValues(formName, formsState);
-  let currentFormState = formsState.get(formName);
   let currentFormListeners = formsListeners.get(formName);
+  let formValues = getValues();
   let allListeners: { [k: string]: any } = {}; // 存储所有监听器
   let notFromFormListeners: { [k: string]: any } = {}; // 存储非表单内部监听器
   Object.keys(currentFormListeners).forEach((listenerName) => {
@@ -462,13 +464,17 @@ const listenerTrigger: ListenerTriggerInterface = (
         return item.listener;
       }
     );
-    notFromFormListeners[listenerName] = [...currentFormListeners[listenerName]]
-      .filter((item) => {
-        return !item.isFromForm;
-      })
-      .map((item) => {
-        return item.listener;
-      });
+    if (listenerName !== formName) {
+      notFromFormListeners[listenerName] = [
+        ...currentFormListeners[listenerName],
+      ]
+        .filter((item) => {
+          return item.from !== "form";
+        })
+        .map((item) => {
+          return item.listener;
+        });
+    }
   });
   const { triggerListener } = utils.listenerOperation(allListeners);
   const formListenersTrigger = (isUpdate: boolean) => {
@@ -476,8 +482,9 @@ const listenerTrigger: ListenerTriggerInterface = (
     // 触发当前表单的状态变化的 listener
     triggerListener(
       formName,
-      currentFormState,
-      currentFormState,
+      formValues,
+      formName,
+      formValues,
       isUpdate ? "update" : "static"
     );
     if (isUpdate) {
@@ -486,14 +493,19 @@ const listenerTrigger: ListenerTriggerInterface = (
         utils.listenerOperation(notFromFormListeners);
       Object.keys(notFromFormListeners).forEach((fieldName) => {
         let fieldValue = getValues(utils.JSONStringToArray(fieldName));
-        triggerNotFromFormListener(fieldName, fieldValue, currentFormState);
+        triggerNotFromFormListener(
+          fieldName,
+          fieldValue,
+          fieldName,
+          formValues
+        );
       });
     }
   };
   const fieldListenersTrigger = (fieldValue: FieldValueType) => {
     const { fieldName, value } = fieldValue as FieldValueType;
     let currentFieldNamePath = utils.ArrayToJSONString(fieldName);
-    triggerListener(currentFieldNamePath, value, currentFormState);
+    triggerListener(currentFieldNamePath, value, fieldName, formValues);
   };
   return {
     formListenersTrigger,

@@ -175,7 +175,7 @@ export const JSONStringToArray: (stringPath: string) => (string | number)[] = (
 type ListenerCallback = (...args: any[]) => void;
 // 针对表单中的 listener 区分其来源，以达到更精准的监听触发
 type ListenerObjectType = {
-  isFromForm: boolean; // 是否来自表单的监听 默认为 false
+  from: "form" | "other"; // 是否来自表单的监听 默认为 "other"
   listener: ListenerCallback;
 };
 
@@ -218,7 +218,7 @@ export const listenerOperation: (listeners: any) => ListenerOperationType = (
   const triggerListener = (key: string, ...args: any[]) => {
     if (!isNone(listeners[key])) {
       return [...listeners[key]].map(
-        (listenerItem: (...args: any[]) => any) =>
+        (listenerItem: (...args: any[]) => void) =>
           listenerItem && listenerItem(...args)
       );
     }

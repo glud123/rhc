@@ -16,7 +16,6 @@ const Example = () => {
       .validate()
       .then((value) => {
         console.log("then", value);
-
         let formValue = form.getValues();
         console.log("formValue", formValue);
         form.setStore({
@@ -60,7 +59,6 @@ const Example = () => {
           label="身份"
           required
           rules={(value) => {
-            console.log(value);
             if (value) {
               return Promise.resolve();
             } else {

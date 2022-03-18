@@ -1,17 +1,25 @@
-import React, { FC, useCallback, useState } from "react";
-import type { FormInstanceType, NamePath } from "../../types";
+import React, { FC, useState } from "react";
+import type {
+  FormInstanceType,
+  FieldNamePath,
+  ValidateInfoType,
+} from "../../types";
 import "./index.css";
 
 interface WrapperValidationProps {
   form: FormInstanceType;
-  name: NamePath;
-  rules: (value: any, allValues: any) => Promise<any>;
+  name: FieldNamePath;
+  rules: (
+    value: any,
+    name: FieldNamePath,
+    allValues: any
+  ) => Promise<ValidateInfoType>;
   onChange?: any;
   [k: string]: any;
 }
 
 const WrapperValidation: FC<WrapperValidationProps> = (props) => {
-  const { children, form, name, onChange, rules, ...rest } = props;
+  const { children, form, onChange, rules, ...rest } = props;
 
   let namePath = form.getFieldName();
 
@@ -22,14 +30,14 @@ const WrapperValidation: FC<WrapperValidationProps> = (props) => {
 
   form.subscribeValidate({
     paths: [namePath],
-    listener: (value: any, allValues: any) => {
-      return rules(value, allValues)
+    listener: (value: any, name: FieldNamePath, allValues: any) => {
+      return rules(value, name, allValues)
         .then(() => {
           setState({
             isValid: true,
             message: "",
           });
-          return Promise.resolve();
+          return Promise.resolve(undefined);
         })
         .catch((e) => {
           setState({

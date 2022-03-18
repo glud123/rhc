@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useReducer } from "react";
+import React, { FC, useEffect, useReducer } from "react";
 import { FormContext, formReducer } from "./context";
 import WrapperValidation from "../wrapper/Validation";
 import WrapperItem from "../wrapper/Item";
@@ -34,20 +34,17 @@ const FormCore: FC<FormCorePropsInterface> = (props) => {
     },
   });
 
-  const listener = useCallback((_, state) => {
-    if (state === "update") {
-      dispatch({
-        type: FormActionEnum.Update,
-      });
-    }
-  }, []);
-
   form.subscribe(
     {
-      listener,
+      listener: (value, fieldName, allValue, state) => {
+        state === "update" &&
+          dispatch({
+            type: FormActionEnum.Update,
+          });
+      },
     },
     [],
-    true
+    "form"
   );
 
   useEffect(() => {

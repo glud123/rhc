@@ -121,7 +121,8 @@ export type FieldNamePath = NamePath | NamePathArray;
 export type SubscribeOptionsType = {
   fieldsName?: FieldNamePath[];
   listener?: (
-    fieldValue: any,
+    value: any,
+    fieldNamePath: FieldNamePath,
     formValues: any,
     state?: "update" | "static"
   ) => void;
@@ -192,7 +193,7 @@ export interface CreateSubscribeInterface {
 }
 
 export interface SubscribeInterface {
-  (options?: SubscribeOptionsType, deps?: any[], fromFormItem?: boolean): void;
+  (options?: SubscribeOptionsType, deps?: any[], from?: "form" | "other"): void;
 }
 
 export interface UseFormInterface {
@@ -201,7 +202,7 @@ export interface UseFormInterface {
 
 export type SubscribeValidateType = {
   paths: FieldNamePath[];
-  listener: (value: any, allValues: any) => Promise<any>;
+  listener: (value: any, name: FieldNamePath, allValues: any) => Promise<ValidateInfoType>;
 };
 
 export interface CreateSubscribeValidateInterface {
@@ -224,8 +225,15 @@ export interface CreateValidateInterface {
   ): ValidateInterface;
 }
 
+type ValidateInfoItemType = {
+  fieldName: FieldNamePath;
+  message: string;
+};
+
+export type ValidateInfoType = ValidateInfoItemType[] | undefined;
+
 export interface ValidateInterface {
-  (paths?: FieldNamePath[]): Promise<any>;
+  (paths?: FieldNamePath[]): Promise<ValidateInfoType>;
 }
 
 export type FormAPIType = {

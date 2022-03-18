@@ -40,7 +40,7 @@ const FormItem: FC<FormItemPropsInterface> = (props) => {
 
   let currentName = form.getFieldName().concat(name);
 
-  form.subscribe({ fieldsName: [currentName, ...dependencies] }, [], true);
+  form.subscribe({ fieldsName: [currentName, ...dependencies] }, [], "form");
 
   let formState = form.subscribeState();
 
