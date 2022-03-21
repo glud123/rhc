@@ -106,6 +106,6 @@ const useStyles = createUseStyles({
     padding: "0px 24px",
   },
   content: {
-    padding: "16px",
+    padding: "16px 72px",
   },
 });
