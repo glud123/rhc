@@ -45,8 +45,7 @@ export default PageLayout;
 
 const useStyles = createUseStyles({
   page: {
-    position: "relative",
-    paddingTop: "60px",
+    marginTop: "60px",
   },
   home: {
     display: "flex",
