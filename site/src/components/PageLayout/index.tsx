@@ -75,7 +75,7 @@ const useStyles = createUseStyles({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "24px",
+    fontSize: "40px",
   },
   title: {
     fontSize: "18px",
