@@ -18,13 +18,22 @@ export const routes = [
     element: <Home />,
   },
   {
+    path: "/components",
+    name: "Components",
+    children: [
+      {
+        path: "",
+        element: <ComponentsPage />,
+      },
+      {
+        path: ":component",
+        element: <ComponentsPage />,
+      },
+    ],
+  },
+  {
     path: "/api",
     name: "API",
     element: <APIPage />,
-  },
-  {
-    path: "/components",
-    name: "Components",
-    element: <ComponentsPage />,
   },
 ];

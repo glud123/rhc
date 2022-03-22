@@ -12,12 +12,19 @@ const Menu: FC<MenuProps> = (props) => {
 
   const location = useLocation();
 
+  let active = options.find((item) => {
+    if (location.pathname === "/") {
+      return location.pathname.includes(item.path);
+    } else {
+      return location.pathname.includes(item.path) && item.path !== "/";
+    }
+  });
+
   useEffect(() => {
-    let active = options.find((item) => item.path === location.pathname);
     if (active && active.name) {
       document.title = `${active.name} | React Hook Component`;
     }
-  }, [location.pathname]);
+  }, [active]);
 
   let nextOptions = options.filter((option) => {
     return !option.hidden;
@@ -31,7 +38,7 @@ const Menu: FC<MenuProps> = (props) => {
             key={option.path}
             style={{
               backgroundColor:
-                location.pathname === option.path ? "#3E497A" : "unset",
+                active.path === option.path ? "#3E497A" : "unset",
             }}
           >
             <Link to={option.path}>{option.name}</Link>

@@ -1,99 +1,25 @@
 import React, { FC, useState } from "react";
-import Form, { useForm } from "@rhc/form";
-import Input from "@/components/Input";
-import Select from "@/components/Select";
-import Button from "@/components/Button";
-import Demo from "./Demo";
+import { useParams } from "react-router-dom";
+import ListMenu from "@/components/ListMenu";
+import * as Pages from "./pages";
 
-const Page = () => {
-  const form = useForm("demo");
+const MenuList = [
+  {
+    label: "Form",
+    path: "form",
+  },
+];
 
-  const [formData, setFormData] = useState<any>();
+const ComponentsPage = () => {
+  const { component } = useParams();
 
-  const handleClick = () => {
-    form.validate().then((data) => {
-      console.log(data);
-      let value = form.getValues();
-      setFormData({ ...value });
-    });
-  };
+  let Component = component ? (Pages as any)[component] : Pages.form;
 
   return (
-    <div>
-      <Form form={form}>
-        <Form.Item
-          name="name"
-          label="姓名"
-          required
-          rules={(value: any) => {
-            if (value) {
-              return Promise.resolve();
-            } else {
-              return Promise.reject(new Error("请输入姓名"));
-            }
-          }}
-        >
-          <Input placeholder="请输入姓名" />
-        </Form.Item>
-        <Form.Item
-          name="age"
-          label="年龄"
-          required
-          rules={(value: any) => {
-            if (value) {
-              return Promise.resolve();
-            } else {
-              return Promise.reject(new Error("请输入年龄"));
-            }
-          }}
-        >
-          <Input type="number" placeholder="请输入年龄" />
-        </Form.Item>
-        <Form.Item
-          name="address"
-          label="地址"
-          required
-          rules={(value: any) => {
-            if (value) {
-              return Promise.resolve();
-            } else {
-              return Promise.reject(new Error("请输入地址"));
-            }
-          }}
-        >
-          <Input placeholder="请输入地址" />
-        </Form.Item>
-        <Form.Item
-          name="class"
-          label="班级"
-          required
-          rules={(value: any) => {
-            if (value) {
-              return Promise.resolve();
-            } else {
-              return Promise.reject(new Error("请输选择班级"));
-            }
-          }}
-        >
-          <Select
-            placeholder="请选择班级"
-            options={[
-              { label: "一班", value: "class1" },
-              { label: "二班", value: "class2" },
-              { label: "三班", value: "class3" },
-            ]}
-          />
-        </Form.Item>
-        <Form.Item name="demo" dependencies={["name", "age", "address"]}>
-          <Demo />
-        </Form.Item>
-      </Form>
-      <Button type="secondary" onClick={handleClick}>
-        取值
-      </Button>
-      <div>{JSON.stringify(formData)}</div>
-    </div>
+    <ListMenu options={MenuList}>
+      <Component />
+    </ListMenu>
   );
 };
 
-export default Page;
+export default ComponentsPage;
