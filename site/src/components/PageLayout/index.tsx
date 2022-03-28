@@ -11,7 +11,6 @@ interface PageLayoutProps {
 
 const PageLayout: FC<PageLayoutProps> = (props) => {
   const { children, options } = props;
-
   const styles = useStyles();
   return (
     <div className={styles.page}>
