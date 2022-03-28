@@ -14,7 +14,7 @@ const Home = () => {
         <span>React Hook Component</span>
       </div>
       <div className={styles.subtitle}>
-        <h2>简单、易用、可扩展</h2>
+        <h2>简单、易用、数据驱动</h2>
       </div>
       <div className={styles.btns}>
         <Button
