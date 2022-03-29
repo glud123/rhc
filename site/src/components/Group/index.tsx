@@ -10,7 +10,11 @@ const Group: FC = (props) => {
   return (
     <ul className={styles.group}>
       {React.Children.map(children, (child) => {
-        return <li>{child}</li>;
+        if (
+          Boolean((child as any)?.type((child as any).props || {}) !== null)
+        ) {
+          return <li>{child}</li>;
+        }
       })}
     </ul>
   );

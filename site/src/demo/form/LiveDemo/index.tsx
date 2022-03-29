@@ -18,9 +18,7 @@ const LiveDemo = () => {
       <Card title="Errors">
         <Errors />
       </Card>
-      <Card title="Submit">
-        <Submit />
-      </Card>
+      <Submit />
     </Group>
   );
 };

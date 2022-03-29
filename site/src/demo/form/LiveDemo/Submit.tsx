@@ -2,6 +2,7 @@ import React from "react";
 import { createUseStyles } from "react-jss";
 import Form, { useForm } from "@rhc/form";
 import Info from "@/components/Info";
+import Card from "@/components/Card";
 
 const Submit = () => {
   const styles = useStyles();
@@ -11,11 +12,15 @@ const Submit = () => {
 
   let values = form.getStore("values");
 
+  if (!values) return null;
+
   return (
-    <div className={styles.submit}>
-      <Info>点击【提交】按钮后的数据将在这里显示</Info>
-      <pre className={styles.pre}>{JSON.stringify(values, null, 2)}</pre>
-    </div>
+    <Card title="Submit">
+      <div className={styles.submit}>
+        <Info>点击【提交】按钮后的数据将在这里显示</Info>
+        <pre className={styles.pre}>{JSON.stringify(values, null, 2)}</pre>
+      </div>
+    </Card>
   );
 };
 
