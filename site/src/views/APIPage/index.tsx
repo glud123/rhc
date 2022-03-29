@@ -1,17 +1,41 @@
-import React from "react";
-import { API, Components } from "@/docs/form";
+import React, { FC, useState } from "react";
+import { useParams } from "react-router-dom";
+import ListMenu from "@/components/ListMenu";
+import * as Pages from "./pages";
 
-const APIPage = () => {
+const MenuList = [
+  {
+    label: "useForm",
+    path: "useForm",
+    isHash: true,
+  },
+  {
+    label: "Form",
+    path: "form",
+    isHash: true,
+  },
+  {
+    label: "Form.Item",
+    path: "item",
+    isHash: true,
+  },
+  {
+    label: "Form.List",
+    path: "list",
+    isHash: true,
+  },
+];
+
+const APIsPage = () => {
+  const { component } = useParams();
+
+  let Component = component ? (Pages as any)[component] : Pages.form;
+
   return (
-    <div>
-      <div id="useform">
-        <API />
-      </div>
-      <div>
-        <Components />
-      </div>
-    </div>
+    <ListMenu options={MenuList} position="right">
+      <Component />
+    </ListMenu>
   );
 };
 
-export default APIPage;
+export default APIsPage;

@@ -3,15 +3,16 @@ import { createUseStyles } from "react-jss";
 
 interface CardProps {
   title: string;
+  titleStyle?: React.CSSProperties;
 }
 
 const Card: FC<CardProps> = (props) => {
-  const { title, children } = props;
+  const { title, titleStyle, children } = props;
   const styles = useStyles();
   return (
     <div className={styles.card}>
       <div className={styles.top}>
-        <span>{title}</span>
+        <span style={titleStyle}>{title}</span>
       </div>
       <div className={styles.bottom}>{children}</div>
     </div>
@@ -22,6 +23,7 @@ export default Card;
 
 const useStyles = createUseStyles({
   card: {
+    height: "100%",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -53,5 +55,7 @@ const useStyles = createUseStyles({
   },
   bottom: {
     width: "100%",
+    height: "0px",
+    flex: 1,
   },
 });

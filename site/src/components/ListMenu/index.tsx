@@ -1,6 +1,7 @@
 import React, { FC } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { createUseStyles } from "react-jss";
+import Card from "@/components/Card";
 
 type MenuItem = {
   label: string;
@@ -11,11 +12,16 @@ type MenuItem = {
 interface ListMenuProps extends ListMenuWrapperProps {}
 
 const ListMenu: FC<ListMenuProps> = (props) => {
-  const { children, ...rest } = props;
+  const { children, position = "left", ...rest } = props;
   const styles = useStyles();
   return (
-    <div className={styles.list_menu}>
-      <ListMenuWrapper {...rest} />
+    <div
+      className={styles.list_menu}
+      style={{
+        justifyContent: position === "left" ? "flex-end" : "flex-start",
+      }}
+    >
+      <ListMenuWrapper {...rest} position={position} />
       <div className={styles.right}>{children}</div>
     </div>
   );
@@ -29,9 +35,10 @@ interface ListMenuWrapperProps {
 }
 
 const ListMenuWrapper: FC<ListMenuWrapperProps> = (props) => {
-  const { options, position = "left" } = props;
+  const { options, position } = props;
   const styles = useStyles();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleClick = (item: MenuItem) => {
     if (item.isHash) {
@@ -42,27 +49,33 @@ const ListMenuWrapper: FC<ListMenuWrapperProps> = (props) => {
   };
 
   return (
-    <ul
-      className={styles.menu}
+    <div
+      className={styles.wrapper}
       style={{
         position: "fixed",
-        bottom: 0,
-        left: position === "left" ? 0 : undefined,
-        right: position === "right" ? 0 : undefined,
+        bottom: "10px",
+        left: position === "left" ? "4%" : undefined,
+        right: position === "right" ? "4%" : undefined,
       }}
     >
-      {options.map((item) => {
-        return (
-          <li
-            className={styles.menu_item}
-            key={item.path}
-            onClick={() => handleClick(item)}
-          >
-            {item.label}
-          </li>
-        );
-      })}
-    </ul>
+      <Card title="Menu" titleStyle={{ color: "#526290", fontSize: "18px" }}>
+        <ul className={styles.menu}>
+          {options.map((item) => {
+            let active = `#${item.path}` === location.hash;
+            return (
+              <li
+                className={`${styles.item} ${active ? styles.active : ""}`}
+                key={item.path}
+                onClick={() => handleClick(item)}
+              >
+                <span className={styles.icon}>{`</>`}</span>
+                {item.label}
+              </li>
+            );
+          })}
+        </ul>
+      </Card>
+    </div>
   );
 };
 
@@ -72,14 +85,40 @@ const useStyles = createUseStyles({
     display: "flex",
   },
   right: {
-    flex: 1,
+    width: "80%",
+  },
+  wrapper: {
+    height: "75%",
+    width: "15%",
   },
   menu: {
     padding: 0,
     margin: 0,
-    height: "80%",
+    height: "100%",
+    width: "100%",
+    overflowY: "auto",
+    display: "flex",
+    flexDirection: "column",
+    gap: "2px",
   },
-  menu_item: {
+  item: {
     listStyle: "none",
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    cursor: "pointer",
+    height: "24px",
+    padding: "0 8px",
+    "&:hover": {
+      backgroundColor: "#ec5990",
+      borderRadius: "2px",
+    },
+  },
+  active: {
+    backgroundColor: "#bf1650",
+    borderRadius: "2px",
+  },
+  icon: {
+    fontSize: "12px",
   },
 });
