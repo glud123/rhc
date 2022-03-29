@@ -8,6 +8,16 @@ const MenuList = [
     label: "Form",
     path: "form",
   },
+  {
+    label: "示例",
+    path: "demo",
+    isHash: true,
+  },
+  {
+    label: "API",
+    path: "api",
+    isHash: true,
+  },
 ];
 
 const ComponentsPage = () => {

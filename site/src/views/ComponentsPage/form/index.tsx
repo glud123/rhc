@@ -1,13 +1,13 @@
 import React from "react";
-import LiveDemo from "./LiveDemo";
-import Subscriptions from "./Subscriptions";
+import Panel from "@/components/Panel";
+import { LiveDemo, Subscriptions } from "@/demo/form";
 
 const Form = () => {
   return (
-    <div>
+    <Panel>
       <Subscriptions />
       <LiveDemo />
-    </div>
+    </Panel>
   );
 };
 
