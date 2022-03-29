@@ -52,7 +52,7 @@ const Example = () => {
           <Input placeholder="请输入姓名" />
         </Form.Item>
         <Form.Item name="age" label="年龄">
-          <Input />
+          <Input type="number" placeholder="请输入年龄" />
         </Form.Item>
         <Form.Item
           name="identity"

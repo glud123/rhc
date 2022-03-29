@@ -14,8 +14,23 @@
     "build": "rm -rf dist; npm install; npx parcel build",
     "watch": "npx parcel watch src/index.tsx"
   },
-  "author": "glud123",
+  "author": "glud0309@gmail.com",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/axios/axios.git"
+  },
+  "keywords": [
+    "form",
+    "react",
+    "hooks",
+    "typescript",
+    "react-hook-form"
+  ],
+  "bugs": {
+    "url": "https://github.com/glud123/rhc/issues"
+  },
+  "homepage": "https://glud123.github.io/rhc/",
   "target": {
     "isLibrary": true
   },
