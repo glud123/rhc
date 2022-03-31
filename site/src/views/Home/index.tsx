@@ -1,12 +1,35 @@
-import React from "react";
+import React, { useLayoutEffect } from "react";
 import { createUseStyles } from "react-jss";
 import { useNavigate } from "react-router-dom";
+import SDK from "@stackblitz/sdk";
 import Button from "@/components/Button";
 import Logo from "jsx:@/assets/images/logo.svg";
 
 const Home = () => {
   const styles = useStyles();
   const navigate = useNavigate();
+
+  useLayoutEffect(() => {
+    SDK.embedProjectId("rhc-form-demo-preview", "rhc-form-demo", {
+      openFile: ["src/LiveDemo/index.tsx", "src/LiveDemo/Example.tsx"],
+      view: "preview",
+      hideDevTools: true,
+      theme: "dark",
+      forceEmbedLayout: true,
+      hideExplorer: true,
+      hideNavigation: true,
+    });
+    SDK.embedProjectId("rhc-form-demo-editor", "rhc-form-demo", {
+      openFile: ["src/LiveDemo/index.tsx", "src/LiveDemo/Example.tsx"],
+      view: "editor",
+      hideDevTools: true,
+      theme: "dark",
+      forceEmbedLayout: true,
+      // hideExplorer: true,
+      hideNavigation: true,
+    });
+  }, []);
+
   return (
     <div className={styles.home}>
       <div className={styles.title}>
@@ -41,6 +64,8 @@ const Home = () => {
           开始使用<span className={styles.icon}>△</span>
         </Button>
       </div>
+      <div id="rhc-form-demo-preview"></div>
+      <div id="rhc-form-demo-editor"></div>
     </div>
   );
 };
