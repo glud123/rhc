@@ -39,7 +39,7 @@ export const isObject = (args: any): args is { [k: string]: any } =>
  * @returns {any}
  */
 export const getValue = (paths: any, value: any = {}) => {
-  let resolve = {};
+  let resolve: any;
   let copyValue = JSON.parse(JSON.stringify(value));
   if (isNone(paths)) {
     resolve = copyValue;
@@ -49,37 +49,13 @@ export const getValue = (paths: any, value: any = {}) => {
   }
   if (isArray(paths)) {
     let lastIndex = paths.length - 1;
-    paths.reduce(
-      (
-        prev: { nextValue: any; resolve: any },
-        cur: string | number,
-        index: number
-      ) => {
-        const { nextValue, resolve } = prev;
-        const current = nextValue[cur];
-        if (isObject(current)) {
-          if (lastIndex !== index) {
-            resolve[cur] = {};
-          }
-        }
-        if (isArray(current)) {
-          if (lastIndex !== index) {
-            resolve[cur] = [];
-          }
-        }
-        if (lastIndex === index) {
-          resolve[cur] = current;
-        }
-        return {
-          nextValue: current,
-          resolve: resolve,
-        };
-      },
-      {
-        nextValue: copyValue,
-        resolve: resolve,
+    paths.reduce((prev: any, cur: string | number, index: number) => {
+      let current = prev[cur];
+      if (lastIndex === index) {
+        resolve = current;
       }
-    );
+      return current;
+    }, copyValue);
   }
   return resolve;
 };
