@@ -76,6 +76,9 @@ export const setValue = (allValue: any, fieldsValue: FieldValueType) => {
     let lastIndex = fieldName.length - 1;
     fieldName.reduce((prev: any, cur: string | number, index: number) => {
       if (lastIndex !== index) {
+        if (isNone(prev[cur])) {
+          prev[cur] = {};
+        }
         return prev[cur];
       } else {
         prev[cur] = value;
