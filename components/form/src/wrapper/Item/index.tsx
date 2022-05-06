@@ -11,17 +11,17 @@ const WrapperItem: FC<WrapperItemInterface> = (props) => {
 
   let nextLabel = label ? (
     typeof label === "string" ? (
-      <label className={required ? "label required" : "label"}>{label}</label>
+      <span className={required ? "label required" : "label"}>{label}</span>
     ) : (
       label
     )
   ) : null;
 
   return (
-    <div className="form-item">
+    <label className="form-item">
       {nextLabel}
       {children}
-    </div>
+    </label>
   );
 };
 
