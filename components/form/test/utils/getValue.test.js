@@ -31,6 +31,10 @@ test("getValue paths undefined", () => {
   expect(getValue(undefined, data)).toEqual(data);
 });
 
+test("getValue paths null", () => {
+  expect(getValue(null, data)).toEqual(data);
+});
+
 test("getValue paths string", () => {
   expect(getValue("a", data)).toBe(1);
 });
@@ -48,4 +52,8 @@ test("getValue paths array string", () => {
 
 test("getValue paths array number", () => {
   expect(getValue(["b", 1, 1, 2], data)).toEqual([1, 2, 3]);
+});
+
+test("getValue value undefined", () => {
+  expect(getValue(["b", 1, 1, 2], undefined)).toEqual(undefined);
 });

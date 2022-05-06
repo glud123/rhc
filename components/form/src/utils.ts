@@ -49,7 +49,7 @@ export const getValue = (paths: any, value: any = {}) => {
   }
   if (isArray(paths)) {
     let lastIndex = paths.length - 1;
-    paths.reduce((prev: any, cur: string | number, index: number) => {
+    paths.reduce((prev: any = {}, cur: string | number, index: number) => {
       let current = prev[cur];
       if (lastIndex === index) {
         resolve = current;
@@ -63,14 +63,16 @@ export const getValue = (paths: any, value: any = {}) => {
  * 按路径设值
  * @param {any} allValue
  * @param {FieldValueType} fieldsValue
+ * @returns {any} newAllValue
  */
-export const setValue = (allValue: any, fieldsValue: FieldValueType) => {
+export const setValue = (allValue: any = {}, fieldsValue: FieldValueType) => {
+  let nextAllValue = JSON.parse(JSON.stringify(allValue));
   const { fieldName, value } = fieldsValue;
   if (isNone(fieldName)) {
-    return;
+    return nextAllValue;
   }
   if (isString(fieldName) || isNumber(fieldName)) {
-    allValue[fieldName] = value;
+    nextAllValue[fieldName] = value;
   }
   if (isArray(fieldName)) {
     let lastIndex = fieldName.length - 1;
@@ -83,8 +85,9 @@ export const setValue = (allValue: any, fieldsValue: FieldValueType) => {
       } else {
         prev[cur] = value;
       }
-    }, allValue);
+    }, nextAllValue);
   }
+  return nextAllValue;
 };
 /**
  * 按路径删除值
@@ -144,6 +147,9 @@ export const JSONStringToArray: (stringPath: string) => (string | number)[] = (
       arrayPath = [];
     } else {
       arrayPath = JSON.parse(stringPath);
+      if (isNumber(arrayPath)) {
+        arrayPath = [arrayPath];
+      }
     }
   } catch (error) {
     arrayPath = [stringPath];

@@ -216,7 +216,11 @@ const createSetValues: CreateSetValuesInterface = (
         // 触发表单监听器，并更新当前表单的状态
         formListenersTrigger(true);
       } else {
-        utils.setValue(currentFormState, fieldsValue as FieldValueType);
+        let nextAllValue = utils.setValue(
+          currentFormState,
+          fieldsValue as FieldValueType
+        );
+        formsState.set(formName, nextAllValue);
         // 触发订阅了当前字段的监听器，并更新当前字段的状态
         fieldListenersTrigger(fieldsValue as FieldValueType);
         // 如果订阅了表单变化，通知其更新
@@ -234,7 +238,11 @@ const createSetValues: CreateSetValuesInterface = (
           formListenersTrigger(true);
           flag = false;
         } else {
-          utils.setValue(currentFormState, fieldValue as FieldValueType);
+          let nextAllValue = utils.setValue(
+            currentFormState,
+            fieldValue as FieldValueType
+          );
+          formsState.set(formName, nextAllValue);
           // 触发订阅了当前字段的监听器，并更新当前字段的状态
           fieldListenersTrigger(fieldValue as FieldValueType);
         }
@@ -553,10 +561,11 @@ const createSetState: CreateSetStateInterface = (
     if (utils.isObject(state)) {
       let currentformsState4Form = formsState4Form.get(formName);
       Object.keys(state).forEach((item) => {
-        utils.setValue(currentformsState4Form, {
+        let nextAllValue = utils.setValue(currentformsState4Form, {
           fieldName: item,
           value: (state as any)[item],
         } as FieldValueType);
+        formsState4Form.set(formName, nextAllValue);
       });
       let currentFormsListeners4FormState =
         formsListeners4FormState.get(formName);
@@ -636,10 +645,11 @@ const createSetStore: CreateSetSoreInterface = (
         formsListeners4Store.get(formName)
       );
       Object.keys(storeValue).forEach((item) => {
-        utils.setValue(currentFormsStore, {
+        let nextAllValue = utils.setValue(currentFormsStore, {
           fieldName: item,
           value: (storeValue as any)[item],
         } as FieldValueType);
+        formsStore.set(formName, nextAllValue);
         triggerListener(item);
       });
     }

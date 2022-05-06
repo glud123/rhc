@@ -10,52 +10,85 @@ let value_object = {};
 let value_array = [];
 
 test("setValue paths array", () => {
-  setValue(data, {
-    fieldName: ["a", "b", "c"],
-    value: value_string,
-  });
-  expect(data).toEqual({
+  expect(
+    setValue(data, {
+      fieldName: ["a", "b", "c"],
+      value: value_string,
+    })
+  ).toEqual({
     a: {
       b: {
         c: value_string,
       },
     },
   });
-  data = {};
+});
+
+test("setValue paths array data", () => {
+  expect(
+    setValue(
+      {
+        a: {
+          b: {
+            c: value_number,
+          },
+        },
+      },
+      {
+        fieldName: ["a", "b", "c"],
+        value: value_string,
+      }
+    )
+  ).toEqual({
+    a: {
+      b: {
+        c: value_string,
+      },
+    },
+  });
 });
 
 test("setValue paths undefined", () => {
-  setValue(data, {
-    fieldName: undefined,
-    value: value_string,
-  });
-  expect(data).toEqual({});
-  data = {};
+  expect(
+    setValue(data, {
+      fieldName: undefined,
+      value: value_string,
+    })
+  ).toEqual({});
 });
 
 test("setValue paths string", () => {
-  setValue(data, {
-    fieldName: "aa",
-    value: value_string,
-  });
-  expect(data).toEqual({ aa: value_string });
-  data = {};
+  expect(
+    setValue(data, {
+      fieldName: "aa",
+      value: value_string,
+    })
+  ).toEqual({ aa: value_string });
 });
 
 test("setValue paths number", () => {
-  setValue(data, {
-    fieldName: 123,
-    value: value_string,
-  });
-  expect(data).toEqual({ 123: value_string });
-  data = {};
+  expect(
+    setValue(data, {
+      fieldName: 123,
+      value: value_string,
+    })
+  ).toEqual({ 123: value_string });
 });
 
 test("setValue paths object", () => {
-  setValue(data, {
-    fieldName: {},
-    value: value_string,
-  });
-  expect(data).toEqual({});
-  data = {};
+  expect(
+    setValue(data, {
+      fieldName: {},
+      value: value_string,
+    })
+  ).toEqual({});
+});
+
+test("setValue value undefined", () => {
+  expect(
+    setValue(undefined, {
+      fieldName: "aa",
+      value: value_string,
+    })
+  ).toEqual({ aa: value_string });
 });
