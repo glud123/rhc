@@ -49,3 +49,14 @@ jobs:
           commit_message: deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Runs a set of commands using the runners shell
+      - name: Codecov
+      - uses: codecov/codecov-action@v3.1.0
+        with:
+          directory: ./components/form/coverage/
+          files: ./clover.xml # optional
+          flags: unittests # optional
+          name: rhc-form # optional
+          fail_ci_if_error: true # optional (default = false)
+          verbose: true # optional (default = false)
