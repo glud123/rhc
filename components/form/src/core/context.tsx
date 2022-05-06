@@ -1,4 +1,5 @@
 import React from "react";
+import { isNone } from "../utils";
 import { FormActionEnum } from "../types";
 import type {
   FormContextType,
@@ -109,7 +110,7 @@ let __FORM_STORE__: __FORM_STORE__type = {
 export const createFormStore: CreateFormStoreInterface = () => {
   const get = (key: keyof __FORM_STORE__type, formName: string) => {
     const preState = __FORM_STORE__[key][formName];
-    if (typeof preState === "undefined") {
+    if (isNone(preState)) {
       __FORM_STORE__[key][formName] = {};
     }
     return __FORM_STORE__[key][formName];
@@ -121,7 +122,7 @@ export const createFormStore: CreateFormStoreInterface = () => {
     nextState: any
   ) => {
     const preState = __FORM_STORE__[key][formName];
-    if (typeof nextState === "undefined") {
+    if (isNone(nextState)) {
       __FORM_STORE__[key][formName] = {};
     } else {
       __FORM_STORE__[key][formName] = { ...preState, ...nextState };
