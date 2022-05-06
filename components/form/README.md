@@ -5,7 +5,7 @@
 [![Build And Deploy](https://github.com/glud123/rhc/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/glud123/rhc/actions/workflows/main.yml)
 [![codecov](https://codecov.io/gh/glud123/rhc/branch/main/graph/badge.svg?token=DBDT3Q70YP)](https://codecov.io/gh/glud123/rhc)
 [![npm version](https://badge.fury.io/js/@rhc%2Fform.svg)](https://badge.fury.io/js/@rhc%2Fform)
-
+![npm](https://img.shields.io/npm/dw/@rhc/form)
 ### 简介
 
 基于 React Hooks 的表单组件。 [了解更多](https://glud123.github.io/rhc/)
