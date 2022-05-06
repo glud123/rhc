@@ -44,7 +44,12 @@ const ListMenuWrapper: FC<ListMenuWrapperProps> = (props) => {
     if (item.isHash) {
       window.location.href = `#${item.path}`;
     } else {
-      navigate(item.path, { replace: true });
+      let pathName = location.pathname;
+      if (pathName.endsWith(`/${item.path}`)) {
+        navigate(pathName, { replace: true });
+      } else {
+        navigate(item.path, { replace: true });
+      }
     }
   };
 
