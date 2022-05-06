@@ -1,11 +1,12 @@
 {
   "name": "@rhc/form",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "react hook component for form",
   "source": "src/index.tsx",
   "main": "dist/main.js",
   "module": "dist/module.js",
   "types": "dist/types.d.ts",
+  "isLibrary": true,
   "files": [
     "dist"
   ],
