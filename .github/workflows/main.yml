@@ -52,7 +52,7 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Codecov
-      - uses: codecov/codecov-action@v3.1.0
+        uses: codecov/codecov-action@v3.1.0
         with:
           directory: ./components/form/coverage/
           files: ./clover.xml # optional
