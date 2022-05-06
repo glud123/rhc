@@ -2,6 +2,8 @@
 
 简单、易用、可扩展的表单组件。
 
+[![codecov](https://codecov.io/gh/glud123/rhc/branch/main/graph/badge.svg?token=DBDT3Q70YP)](https://codecov.io/gh/glud123/rhc)
+
 ### 简介
 
 基于 React Hooks 的表单组件。 [了解更多](https://glud123.github.io/rhc/)
