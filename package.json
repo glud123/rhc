@@ -10,6 +10,7 @@
     "site-build": "npm run site build",
     "c-build": "./batch_execution_scipt ./components build",
     "c-start": "./batch_execution_scipt ./components start",
+    "c-test": "./batch_execution_scipt ./components test",
     "site": "npm run --prefix site",
     "components": "npm run --prefix components/*"
   },
