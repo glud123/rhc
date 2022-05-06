@@ -2,6 +2,7 @@
 
 简单、易用、可扩展的表单组件。
 
+[![Build And Deploy](https://github.com/glud123/rhc/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/glud123/rhc/actions/workflows/main.yml)
 [![codecov](https://codecov.io/gh/glud123/rhc/branch/main/graph/badge.svg?token=DBDT3Q70YP)](https://codecov.io/gh/glud123/rhc)
 
 ### 简介
