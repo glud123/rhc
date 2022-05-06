@@ -48,8 +48,7 @@ jobs:
       - name: Codecov
         uses: codecov/codecov-action@v3.1.0
         with:
-          directory: components/form/coverage/
-          files: ./clover.xml # optional
+          files: components/form/coverage/clover.xml # optional
           flags: unittests # optional
           name: rhc-form # optional
           fail_ci_if_error: true # optional (default = false)
