@@ -2,10 +2,9 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 20px;
 }
 
-.form-item .label {
+.form-item .form-item-label {
   height: 24px;
   min-width: 76px;
   display: flex;
@@ -15,7 +14,7 @@
   white-space: nowrap;
 }
 
-.form-item .required::after {
+.form-item .form-item-required::after {
   padding-top: 4px;
   content: "*";
   color: #ff4d4f;

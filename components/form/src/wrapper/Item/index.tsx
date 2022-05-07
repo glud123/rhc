@@ -11,7 +11,11 @@ const WrapperItem: FC<WrapperItemInterface> = (props) => {
 
   let nextLabel = label ? (
     typeof label === "string" ? (
-      <span className={required ? "label required" : "label"}>{label}</span>
+      <span
+        className={`form-item-label ${required ? "form-item-required" : ""}`}
+      >
+        {label}
+      </span>
     ) : (
       label
     )

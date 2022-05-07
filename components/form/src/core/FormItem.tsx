@@ -20,13 +20,10 @@ export interface FormItemPropsInterface {
 const FormItem: FC<FormItemPropsInterface> = (props) => {
   const {
     name,
-    label,
-    required,
     dependencies = [],
     children,
     wrapperItem,
     wrapperValidation,
-    rules,
     ...rest
   } = props;
 
@@ -50,42 +47,31 @@ const FormItem: FC<FormItemPropsInterface> = (props) => {
     form.setValues({ fieldName: currentName, value: v });
   };
 
-  let nextChildren = children;
-
-  if (!(children && typeof (children as any).type === "string")) {
-    if (rules && rules.length > 0) {
-      nextChildren = React.createElement(
-        (wrapperValidation
-          ? wrapperValidation
-          : wrapper.wrapperValidation) as any,
-        {
-          form: form,
-          name: name,
-          disabled: formState.disabled,
-          rules: rules,
-          value: currentValue,
-          onChange: handleChange,
-        },
-        children
-      );
-    } else {
-      nextChildren = React.cloneElement(children as React.ReactElement, {
-        disabled: formState.disabled,
-        value: currentValue,
-        onChange: handleChange,
-      });
-    }
-  }
+  let nextChildren = React.createElement(
+    (wrapperItem ? wrapperItem : wrapper.wrapperItem) as any,
+    {
+      label: rest.label,
+      required: rest.required,
+    },
+    <Item
+      form={form}
+      disabled={formState.disabled}
+      value={currentValue}
+      onChange={handleChange}
+    >
+      {children}
+    </Item>
+  );
 
   return (
     <ItemContext.Provider value={{ __parent: currentName }}>
       {React.createElement(
-        (wrapperItem ? wrapperItem : wrapper.wrapperItem) as any,
+        (wrapperValidation
+          ? wrapperValidation
+          : wrapper.wrapperValidation) as any,
         {
-          form: form,
-          name,
-          label,
-          required,
+          form,
+          disabled: formState.disabled,
           ...rest,
         },
         nextChildren
@@ -97,3 +83,16 @@ const FormItem: FC<FormItemPropsInterface> = (props) => {
 export default FormItem;
 
 export type FormItemType = typeof FormItem;
+
+interface ItemProps {
+  [k: string]: any;
+}
+
+const Item: FC<ItemProps> = (props) => {
+  const { children, ...rest } = props;
+  return (
+    <div className="form-item-content" style={{ width: "100%" }}>
+      {React.cloneElement(children as React.ReactElement, rest)}
+    </div>
+  );
+};

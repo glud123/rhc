@@ -311,7 +311,7 @@ const createSubscribe: CreateSubscribeInterface = (
     const [, forceUpdate] = useReducer((c) => c + 1, 0) as [never, () => void];
     const { fieldsName, listener } = options;
     let nextListener = listener ? listener : forceUpdate;
-    // 区分 subscribe 来源，是否来自表单的监听，默认为 false
+    // 区分 subscribe 来源，是否来自表单的监听，默认为 other
     const listenerObj = {
       from: from,
       listener: nextListener,
@@ -432,7 +432,7 @@ const createSubscribeValidate: CreateSubscribeValidateInterface = (
         currentFormListeners4Validate
       );
       let unsubscribe: () => void = () => {};
-      if (utils.isArray(paths)) {
+      if (utils.isArray(paths) && !utils.isNone(listener)) {
         paths.forEach((path) => {
           const stringifyPath = utils.ArrayToJSONString(path);
           addListener(stringifyPath, listener);

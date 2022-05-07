@@ -202,7 +202,7 @@ export interface UseFormInterface {
 
 export type SubscribeValidateType = {
   paths: FieldNamePath[];
-  listener: (value: any, name: FieldNamePath, allValues: any) => Promise<ValidateInfoType>;
+  listener?: (value: any, name: FieldNamePath, allValues: any) => Promise<ValidateInfoType>;
 };
 
 export interface CreateSubscribeValidateInterface {

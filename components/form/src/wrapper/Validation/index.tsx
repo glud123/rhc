@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useState, useEffect } from "react";
 import type {
   FormInstanceType,
   FieldNamePath,
@@ -8,18 +8,17 @@ import "./index.css";
 
 interface WrapperValidationProps {
   form: FormInstanceType;
-  name: FieldNamePath;
-  rules: (
+  disabled?: boolean;
+  rules?: (
     value: any,
     name: FieldNamePath,
     allValues: any
   ) => Promise<ValidateInfoType>;
-  onChange?: any;
   [k: string]: any;
 }
 
 const WrapperValidation: FC<WrapperValidationProps> = (props) => {
-  const { children, form, onChange, rules, ...rest } = props;
+  const { children, form, disabled, rules } = props;
 
   let namePath = form.getFieldName();
 
@@ -28,9 +27,10 @@ const WrapperValidation: FC<WrapperValidationProps> = (props) => {
     message: "",
   });
 
-  form.subscribeValidate({
-    paths: [namePath],
-    listener: (value: any, name: FieldNamePath, allValues: any) => {
+  let listener;
+
+  if (rules && rules.length > 0) {
+    listener = (value: any, name: FieldNamePath, allValues: any) => {
       return rules(value, name, allValues)
         .then(() => {
           setState({
@@ -46,29 +46,47 @@ const WrapperValidation: FC<WrapperValidationProps> = (props) => {
           });
           return Promise.reject({ field: namePath, message: e.message });
         });
-    },
-  });
+    };
+  }
 
-  const handleChange = (v: any) => {
-    onChange && onChange(v);
-    form.validate([namePath]);
-  };
+  form.subscribeValidate(
+    {
+      paths: [namePath],
+      listener,
+    },
+    [rules]
+  );
+
+  form.subscribe(
+    {
+      fieldsName: [namePath],
+      listener: () => {
+        form.validate([namePath]);
+      },
+    },
+    [rules]
+  );
+
+  useEffect(() => {
+    setState({
+      isValid: disabled ? true : state.message === "",
+      message: state.message,
+    });
+  }, [disabled]);
 
   const { isValid, message } = state;
 
   return (
-    <div className="verification_container">
-      <div
-        className={`verification_content ${
-          !isValid && "verification_content_error"
-        }`}
-      >
-        {React.cloneElement(children as React.ReactElement, {
-          onChange: handleChange,
-          ...rest,
-        })}
+    <div className="validate-container">
+      <div className={`validate-content ${!isValid ? "validate-error" : ""}`}>
+        {children}
       </div>
-      {!isValid && <div className="verification_error">{message}</div>}
+      <div
+        className="validate-msg"
+        style={{ visibility: isValid ? "hidden" : "visible" }}
+      >
+        {message}
+      </div>
     </div>
   );
 };
