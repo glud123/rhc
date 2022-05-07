@@ -33,6 +33,7 @@ export type FormInstanceType = {
   subscribe: SubscribeInterface;
   validate: ValidateInterface;
   subscribeValidate: SubscribeValidateInterface;
+  getState: GetStateInterface;
   setState: SetStateInterface;
   subscribeState: SubscribeStateInterface;
   getStore: GetSoreInterface;
@@ -202,7 +203,11 @@ export interface UseFormInterface {
 
 export type SubscribeValidateType = {
   paths: FieldNamePath[];
-  listener?: (value: any, name: FieldNamePath, allValues: any) => Promise<ValidateInfoType>;
+  listener?: (
+    value: any,
+    name: FieldNamePath,
+    allValues: any
+  ) => Promise<ValidateInfoType>;
 };
 
 export interface CreateSubscribeValidateInterface {
@@ -270,6 +275,20 @@ export interface CreateSetStateInterface {
 
 export interface SetStateInterface {
   (state: FormStateType): void;
+}
+
+export interface CreateGetStateInterface {
+  (
+    formName: string,
+    formsState4Form: CreateFormStoreType["formsState4Form"]
+  ): GetStateInterface;
+}
+
+export interface GetStateInterface {
+  (key?: string):
+    | FormStateType
+    | FormStateType[keyof FormStateType]
+    | undefined;
 }
 
 type StoreListenerType = {

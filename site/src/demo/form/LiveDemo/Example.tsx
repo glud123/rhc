@@ -12,6 +12,8 @@ const Example = () => {
   const styles = useStyles();
 
   const handleSubmit = () => {
+    let disabled = form.getState("disabled");
+    if (disabled) return;
     form
       .validate()
       .then((value) => {

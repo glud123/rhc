@@ -18,6 +18,7 @@ import {
   NamePathArray,
   FieldValueType,
   FormStateType,
+  CreateGetStateInterface,
   CreateSetStateInterface,
   CreateSubscribeStateInterface,
   CreateSubscribeStoreInterface,
@@ -92,6 +93,8 @@ const createFormAPI: () => FormAPIType = () => {
       formName,
       formsListeners4Validate
     );
+    // 获取表单状态
+    const getState = createGetState(formName, formsState4Form);
     // 表单状态
     const setState = createSetState(
       formName,
@@ -124,6 +127,7 @@ const createFormAPI: () => FormAPIType = () => {
       subscribe,
       validate,
       subscribeValidate,
+      getState,
       setState,
       subscribeState,
       getStore,
@@ -544,6 +548,16 @@ const getFieldName: GetFieldNameInterface = (pathOffset = 0) => {
   }
   namePath = namePath.splice(0, namePath.length - pathOffset);
   return namePath;
+};
+
+/**
+ * 获取表单基础状态
+ */
+const createGetState: CreateGetStateInterface = (formName, formsState4Form) => {
+  return (key) => {
+    let currentFormState = formsState4Form.get(formName);
+    return utils.getValue(key, currentFormState);
+  };
 };
 
 /**
