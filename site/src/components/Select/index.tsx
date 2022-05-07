@@ -12,6 +12,7 @@ interface SelectProps {
   onChange?: (v: string) => void;
   options?: OptionItem[];
   placeholder?: string;
+  disabled?: boolean;
 }
 
 const Select: FC<SelectProps> = (props) => {
@@ -20,6 +21,7 @@ const Select: FC<SelectProps> = (props) => {
     onChange,
     options: propsOptions = [],
     placeholder = "请选择...",
+    disabled,
   } = props;
 
   const styles = useStyles();
@@ -29,13 +31,13 @@ const Select: FC<SelectProps> = (props) => {
   };
 
   let options = [{ label: placeholder, value: "" }, ...propsOptions];
-
   return (
     <select
       className={styles.select}
       value={value}
       onChange={handleChange}
       placeholder={placeholder}
+      disabled={disabled}
     >
       {options.map((item) => {
         return (

@@ -41,5 +41,11 @@ const useStyles = createUseStyles({
     borderStyle: "solid",
     borderWidth: "1px",
     transition: "all 0.3s ease-in-out",
+    "&:disabled": {
+      backgroundColor: "#f5f5f5",
+      color: "-internal-light-dark(graytext, rgb(170, 170, 170))",
+      opacity: 0.7,
+      borderColor: "rgba(118, 118, 118, 0.3)",
+    },
   },
 });
